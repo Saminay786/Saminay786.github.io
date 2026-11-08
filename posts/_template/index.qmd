@@ -1,0 +1,63 @@
+---
+title: "TITLE: state the question or the product, not the method"
+subtitle: "One line: what decision this informs"
+description: "One-sentence summary shown on the blog listing."
+author: "Samina Yasmin"
+date: 2026-01-01          # update
+categories: [case study]  # e.g. case study, teardown, pricing, causal inference, experimentation
+# image: thumbnail.png    # add a key chart as the listing thumbnail
+draft: true               # remove (or set false) when ready to publish
+---
+
+<!--
+HOW TO USE
+1. Copy this folder to posts/<yyyy-mm-dd-short-slug>/ (folders starting with "_" are never rendered).
+2. Fill in each section. Delete the prompts in italics.
+3. Remove `draft: true` and run `quarto preview`.
+For a product teardown, read "Approach" as "How the product decides" and "Evidence" as "What I observed".
+-->
+
+**TL;DR:** *2–3 sentences: the problem, what you did, the headline result, and what it means for the decision.*
+
+## Problem
+
+*Who is the decision-maker and what decision are they making? Why does it matter (revenue, cost, user experience)? What would "good" look like?*
+
+## Approach
+
+*Data: source, grain, time period, key filters.*
+
+*Method: what you did and **why this method** over the obvious alternatives. Name the assumptions explicitly, e.g. identification strategy for causal claims.*
+
+## Evidence / Results
+
+*Headline findings with the charts or tables that support them. Lead each with the takeaway, then the figure.*
+
+```{python}
+#| label: fig-key-result
+#| fig-cap: "Caption that states the takeaway."
+#| echo: false
+# key chart here
+```
+
+## Metrics
+
+| Metric | Definition | Baseline | Result |
+|--------|------------|----------|--------|
+| *Primary (decision) metric* | | | |
+| *Guardrail metric* | | | |
+| *Model / fit diagnostic* | | | |
+
+*Why these metrics: how do they map to the decision in the Problem section?*
+
+## Limitations
+
+*What could make this wrong? Data gaps, untestable assumptions, confounding, external validity, what you'd need to see to trust it more.*
+
+## What's next
+
+*The next experiment, analysis or feature you'd build, and what it would tell you.*
+
+---
+
+*Code: [GitHub](https://github.com/Saminay786) <!-- replace with repo link -->*

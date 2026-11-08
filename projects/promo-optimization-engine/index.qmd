@@ -1,0 +1,41 @@
+---
+title: "Promo Optimization Engine"
+description: "Causal uplift modelling, promo calendar optimisation and a Bayesian marketing mix model on the Dunnhumby Complete Journey dataset."
+date: 2026-11-08
+categories: [pricing, causal inference, optimization, Bayesian]
+# image: thumbnail.png   # TODO: add a thumbnail (e.g. a key chart) to this folder and uncomment
+---
+
+::: {.callout-warning}
+## Work in progress
+This page is a placeholder. Write-up and results coming soon.
+:::
+
+**Code:** [GitHub repository](https://github.com/Saminay786)
+<!-- TODO: replace the link above with the repo URL, e.g. https://github.com/Saminay786/promo-optimization-engine -->
+
+## Overview
+
+Which promotions actually create incremental sales, and how should a retailer schedule them? This project works through that question with three components, using the Dunnhumby *The Complete Journey* household-level transaction data:
+<!-- TODO (optional): link the dataset source -->
+
+
+1. **Causal uplift modelling**: estimate the incremental effect of promotions (display, mailer, coupon) on purchase behaviour, rather than raw lift.
+2. **Promo calendar optimisation**: use the uplift estimates to choose which products to promote and when, subject to budget and frequency constraints.
+3. **Bayesian marketing mix model**: estimate channel-level contributions with adstock and saturation, with uncertainty intervals.
+
+## Results
+
+<!-- TODO: fill in headline results, e.g.
+- Estimated incremental uplift: X% (95% interval: ...)
+- Optimised calendar vs. baseline: +Y% incremental margin
+- Key chart(s)
+-->
+
+*Results to be added.*
+
+## Limitations
+
+<!-- TODO: observational data, confounding assumptions, dataset period, etc. -->
+
+*To be added.*

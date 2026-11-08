@@ -1,0 +1,58 @@
+/* ---- Typography ---- */
+body {
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+h1, h2, h3, .navbar-brand {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+main h2 {
+  margin-top: 2.25rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* ---- Navbar ---- */
+.navbar {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+}
+
+/* ---- Listings (blog + projects) ---- */
+.quarto-grid-item.card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.quarto-grid-item.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.listing-categories .listing-category,
+.quarto-category {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.6rem;
+}
+
+/* ---- About page ---- */
+.about-entity .about-link {
+  border-radius: 6px;
+}
+
+/* ---- Content ---- */
+main table {
+  font-size: 0.95rem;
+}
+
+.callout {
+  border-radius: 6px;
+}

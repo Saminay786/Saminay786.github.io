@@ -1,0 +1,34 @@
+---
+title: "Samina Yasmin"
+subtitle: "Decision Science Analyst · Turning data into decisions"
+# image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: github
+      text: GitHub
+      href: https://github.com/Saminay786
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/samina-yasmin-800a2614a/
+---
+
+Hi, I'm Samina. I work as a decision science analyst at Accenture, mostly on pricing and forecasting problems. Before that I did research on how people behave and make choices, and that still shapes how I think about data.
+
+What I enjoy most is helping people make better decisions with data, whether that's pricing, promotions or figuring out whether something actually worked.
+
+This is where I share projects and things I'm learning along the way. Some of it will be rough around the edges, and that's okay.
+
+## Education
+
+**IIT Madras** | MS (Research), Department of Management Studies\
+Research at the intersection of industrial-organizational psychology and quantitative methods: designing survey-based studies and testing behavioral hypotheses with statistical models, including moderation, mediation and conditional process analysis (SPSS, PROCESS).
+
+**University of Mumbai** | B.Tech, Electronics Engineering | 2021
+
+## Experience
+
+**Accenture Strategy & Consulting** | Decision Science Analyst | 2025 – present\
+Building pricing, forecasting and demand-sourcing models for industrial clients.
+
+**American Express, Data Analytics & Risk Tech. Lab (via IIT Madras)** | Research Associate | 2023 – 2025
