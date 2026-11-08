@@ -1,41 +1,80 @@
 ---
 title: "Promo Optimization Engine"
-description: "Causal uplift modelling, promo calendar optimisation and a Bayesian marketing mix model on the Dunnhumby Complete Journey dataset."
+description: "Which promotions actually create extra sales, and how should a retailer schedule them? Causal uplift (Double ML), promo calendar optimisation and a Bayesian marketing mix model on dunnhumby's Complete Journey data."
 date: 2026-11-08
 categories: [pricing, causal inference, optimization, Bayesian]
-# image: thumbnail.png   # TODO: add a thumbnail (e.g. a key chart) to this folder and uncomment
+image: discount-roi.png
 ---
 
-::: {.callout-warning}
-## Work in progress
-This page is a placeholder. Write-up and results coming soon.
-:::
+**Code:** [github.com/Saminay786/promo-optimization-engine](https://github.com/Saminay786/promo-optimization-engine)
 
-**Code:** [GitHub repository](https://github.com/Saminay786)
-<!-- TODO: replace the link above with the repo URL, e.g. https://github.com/Saminay786/promo-optimization-engine -->
+**TL;DR:** A raw before/after comparison overstates how much discounts work. Once I controlled for displays, mailers, seasonality and past sales, the effect dropped by about 30%, and **44% of promo volume turned out to be sales that would have happened anyway**. Using the corrected estimates, an optimised promo calendar beat a simple "deepest discount on top sellers" rule on the same budget. A separate category-level model suggests that in most categories, discounts don't fully pay for themselves.
 
-## Overview
+## The problem
 
-Which promotions actually create incremental sales, and how should a retailer schedule them? This project works through that question with three components, using the Dunnhumby *The Complete Journey* household-level transaction data:
-<!-- TODO (optional): link the dataset source -->
+Retailers spend a lot on promotions. The common way to judge them is "units sold during the promo vs. a normal week". That number mixes up three things: the discount itself, the display or mailer that usually comes with it, and sales that would have happened anyway. If you plan next quarter's promos from that number, you over-invest in discounts.
 
+So I wanted to answer two practical questions:
 
-1. **Causal uplift modelling**: estimate the incremental effect of promotions (display, mailer, coupon) on purchase behaviour, rather than raw lift.
-2. **Promo calendar optimisation**: use the uplift estimates to choose which products to promote and when, subject to budget and frequency constraints.
-3. **Bayesian marketing mix model**: estimate channel-level contributions with adstock and saturation, with uncertainty intervals.
+1. **How much extra volume does a discount actually cause?**
+2. **Given that, which product should get which discount in which week?**
+
+## Data
+
+dunnhumby's *The Complete Journey*: two years of grocery transactions from ~2,500 households, plus display and mailer data. I focused on the **137 top-revenue products over 99 weeks** (11,892 product-weeks). Fuel, gift cards and miscellaneous items were excluded.
+
+## Approach
+
+**1. Causal uplift (Double ML).** I turned the transactions into a product × week panel. The "treatment" is discount depth, and the controls are display/mailer exposure, lagged sales, seasonality and how much else in the category was on promo. I estimated the effect with Double Machine Learning (EconML `LinearDML`, LightGBM, 5-fold cross-fitting) and compared it with a naive estimate and a placebo test.
+
+**2. Promo calendar optimisation.** I fed the per-category effects into an integer program (OR-Tools CP-SAT). It picks a discount (10/20/30% or none) for each product-week under a budget, weekly slot limits, frequency caps, a per-category cap and no back-to-back promos. I benchmarked it against a common rule of thumb: put the deepest discount on the top sellers.
+
+**3. Bayesian marketing mix model (extension).** As a top-down cross-check, I modelled weekly *category* sales for 8 categories with PyMC-Marketing. The model has three levers (discount rate, mailers, displays), and it accounts for carryover (adstock) and diminishing returns (saturation).
+
+Everything is wrapped in a FastAPI service (`POST /optimize`), with Docker, tests and CI.
 
 ## Results
 
-<!-- TODO: fill in headline results, e.g.
-- Estimated incremental uplift: X% (95% interval: ...)
-- Optimised calendar vs. baseline: +Y% incremental margin
-- Key chart(s)
--->
+### Discounts work, but less than they appear to
 
-*Results to be added.*
+| | Elasticity θ | What 10% off does |
+|---|---|---|
+| Naive (no controls) | 3.49 | +42% units |
+| **Double ML** | **2.51** (95% CI 2.18–2.85) | **+29% units** |
+| Placebo test | 0.01 | no effect, as expected |
+
+About **43.8% of promo volume was non-incremental**. Those were sales the retailer would have made anyway.
+
+### Optimised calendar vs. rule of thumb
+
+Same $5k budget, 8 weeks, 10 promo slots per week:
+
+| | Incremental margin | Budget used |
+|---|---|---|
+| "Deepest discount on top sellers" | $60 | full |
+| **Optimised (CP-SAT)** | **$719** | 37% less |
+
+The gap is large mainly because the heuristic puts deep discounts on products that would sell anyway. Treat the absolute dollar figure with caution (see Limitations).
+
+### Category view: most discounts don't pay back
+
+![Margin returned per dollar of retailer discount, by category (Bayesian MMM, 94% credible intervals).](discount-roi.png){fig-alt="Dot-and-interval chart of discount ROI for 8 grocery categories. Only frozen pizza has a mean above the break-even line of 1 (1.24); the others range from 0.23 for bread to 0.74 for cheese."}
+
+- Discount ROI is **below 1 in 7 of 8 categories**. Soft drinks return about $0.69 per $1 of discount [0.50–0.89]. Only frozen pizza is above break-even (1.24 [0.71–1.75]), and even there the interval is wide.
+- Displays look cheap to break even on (roughly $0.005–0.08 per placement), which suggests shifting some discount money into in-store displays. Whether that pays depends on display costs I don't have.
+- **Cross-check:** both models rank the categories the same way. However, the category-level effect is only about **45–55%** of the product-level one for bread, cheese and soft drinks. That fits with discounts partly stealing sales from other products in the same category (cannibalisation).
+- Model health: 0 divergences, max r-hat 1.008, in-sample R² 0.44–0.64 for 7 of 8 categories (deli meats is weaker at 0.21).
 
 ## Limitations
 
-<!-- TODO: observational data, confounding assumptions, dataset period, etc. -->
+- **Observational data.** The Double ML estimate is causal only if the controls capture everything that drives both promo decisions and sales.
+- **No cost data.** Margin is assumed to be 30% of shelf price, and suppliers are assumed to fund 50% of the discount. Display and mailer costs are unknown, so I report break-even costs instead.
+- **The optimiser's $ gain is probably overstated.** The MMM suggests the product-level effect is roughly 2× the category-level gain, because of cannibalisation. The calendar handles that only with a simple category cap.
+- **Pull-forward** (shoppers stocking up, then buying less later) is approximated by a "no back-to-back promos" rule, not modelled directly.
+- The MMM has only 82 weeks per category, and mailers and displays tend to run together, so their separate effects are uncertain.
 
-*To be added.*
+## What's next
+
+- Scale the product-level effects by a category-level factor (or model cross-product effects) so the optimiser stops over-crediting discounts.
+- Model pull-forward explicitly instead of using a rule.
+- Add real cost inputs, so the display vs. discount trade-off becomes a recommendation rather than a break-even range.
