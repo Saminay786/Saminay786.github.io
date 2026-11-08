@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2026-11-08">
-<meta name="description" content="Causal uplift modelling, promo calendar optimisation and a Bayesian marketing mix model on the Dunnhumby Complete Journey dataset.">
+<meta name="description" content="Which promotions actually create extra sales, how should a retailer schedule them, and how would you prove it works? Double ML, promo calendar optimisation, a Bayesian MMM and an A/B test design on dunnhumby’s Complete Journey data.">
 
 <title>Promo Optimization Engine – Samina</title>
 <style>
@@ -144,13 +144,14 @@ ul.task-list li input[type="checkbox"] {
     <div class="quarto-category">pricing</div>
     <div class="quarto-category">causal inference</div>
     <div class="quarto-category">optimization</div>
+    <div class="quarto-category">experimentation</div>
     <div class="quarto-category">Bayesian</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    Causal uplift modelling, promo calendar optimisation and a Bayesian marketing mix model on the Dunnhumby Complete Journey dataset.
+    Which promotions actually create extra sales, how should a retailer schedule them, and how would you prove it works? Double ML, promo calendar optimisation, a Bayesian MMM and an A/B test design on dunnhumby’s Complete Journey data.
   </div>
 </div>
 
@@ -173,42 +174,207 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>Work in progress
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This page is a placeholder. Write-up and results coming soon.</p>
-</div>
-</div>
-<p><strong>Code:</strong> <a href="https://github.com/Saminay786">GitHub repository</a> <!-- TODO: replace the link above with the repo URL, e.g. https://github.com/Saminay786/promo-optimization-engine --></p>
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>Which promotions actually create incremental sales, and how should a retailer schedule them? This project works through that question with three components, using the Dunnhumby <em>The Complete Journey</em> household-level transaction data: <!-- TODO (optional): link the dataset source --></p>
-<ol type="1">
-<li><strong>Causal uplift modelling</strong>: estimate the incremental effect of promotions (display, mailer, coupon) on purchase behaviour, rather than raw lift.</li>
-<li><strong>Promo calendar optimisation</strong>: use the uplift estimates to choose which products to promote and when, subject to budget and frequency constraints.</li>
-<li><strong>Bayesian marketing mix model</strong>: estimate channel-level contributions with adstock and saturation, with uncertainty intervals.</li>
-</ol>
+<p><strong>Code:</strong> <a href="https://github.com/Saminay786/promo-optimization-engine">github.com/Saminay786/promo-optimization-engine</a></p>
+<p><strong>TL;DR:</strong></p>
+<ul>
+<li><strong>Discounts work, but less than they appear to.</strong> After controlling for displays, mailers and seasonality, the effect drops by about 30%, and 44% of promo volume would have sold anyway.</li>
+<li><strong>Planning with corrected numbers pays.</strong> An optimised promo calendar beats the usual “deepest discount on top sellers” rule on the same budget.</li>
+<li><strong>At category level, most discounts don’t pay for themselves</strong> (7 of 8 categories).</li>
+<li><strong>The predicted gain is too small to prove with a store test of this size.</strong> That changes how a “no effect” result should be read.</li>
+</ul>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">The problem</h2>
+<p>Retailers spend a lot on promotions. The common way to judge them is “units sold during the promo vs.&nbsp;a normal week”. That number mixes up three things: the discount itself, the display or mailer that usually comes with it, and sales that would have happened anyway. Plan from it, and you over-invest in discounts.</p>
+<p>The project works through four questions in order:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Question</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1. Measure</strong></td>
+<td>How much extra volume does a discount actually <em>cause</em>?</td>
+<td>Double Machine Learning</td>
+</tr>
+<tr class="even">
+<td><strong>2. Decide</strong></td>
+<td>Which product should get which discount, in which week?</td>
+<td>Integer optimisation (CP-SAT)</td>
+</tr>
+<tr class="odd">
+<td><strong>3. Cross-check</strong></td>
+<td>Does a top-down view agree?</td>
+<td>Bayesian marketing mix model</td>
+</tr>
+<tr class="even">
+<td><strong>4. Test</strong></td>
+<td>How would we prove it works in real stores?</td>
+<td>A/B test design: power simulation + CUPED</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Data:</strong> dunnhumby’s <em>The Complete Journey</em>, with two years of grocery transactions from ~2,500 households plus display and mailer data. I used the <strong>137 top-revenue products over 99 weeks</strong> (11,892 product-weeks), excluding fuel, gift cards and miscellaneous items.</p>
 </section>
-<section id="results" class="level2">
-<h2 class="anchored" data-anchor-id="results">Results</h2>
-<!-- TODO: fill in headline results, e.g.
-- Estimated incremental uplift: X% (95% interval: ...)
-- Optimised calendar vs. baseline: +Y% incremental margin
-- Key chart(s)
--->
-<p><em>Results to be added.</em></p>
+<section id="measure-what-does-a-discount-really-cause" class="level2">
+<h2 class="anchored" data-anchor-id="measure-what-does-a-discount-really-cause">1. Measure: what does a discount really cause?</h2>
+<p>I built a product × week panel. The <em>treatment</em> is discount depth. The <em>controls</em> are display/mailer exposure, past sales, seasonality and how much else in the category was on promo. I then estimated the effect with Double ML (EconML <code>LinearDML</code>, LightGBM, 5-fold cross-fitting) and compared it with a naive estimate and a placebo test.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Elasticity θ</th>
+<th>What 10% off does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Naive (no controls)</td>
+<td>3.49</td>
+<td>+42% units</td>
+</tr>
+<tr class="even">
+<td><strong>Double ML</strong></td>
+<td><strong>2.51</strong> (95% CI 2.18–2.85)</td>
+<td><strong>+29% units</strong></td>
+</tr>
+<tr class="odd">
+<td>Placebo test</td>
+<td>0.01</td>
+<td>no effect, as expected</td>
+</tr>
+</tbody>
+</table>
+<p>About <strong>43.8% of promo volume was non-incremental</strong>. Those were sales the retailer would have made anyway.</p>
+</section>
+<section id="decide-build-the-promo-calendar" class="level2">
+<h2 class="anchored" data-anchor-id="decide-build-the-promo-calendar">2. Decide: build the promo calendar</h2>
+<p>The per-category effects feed an integer program (OR-Tools CP-SAT). It picks a discount (10/20/30% or none) for each product-week, subject to a budget, weekly promo slots, a frequency cap, a per-category cap and no back-to-back promos. I compared it with a common rule of thumb: deepest discount on the top sellers.</p>
+<p>Same $5k budget, 8 weeks, 10 promo slots per week:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Incremental margin</th>
+<th>Budget used</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>“Deepest discount on top sellers”</td>
+<td>$60</td>
+<td>full</td>
+</tr>
+<tr class="even">
+<td><strong>Optimised calendar</strong></td>
+<td><strong>$719</strong></td>
+<td>37% less</td>
+</tr>
+</tbody>
+</table>
+<p>The rule of thumb loses mostly because it puts deep discounts on products that would sell anyway. Treat the absolute dollar figure with caution: step 3 suggests it’s overstated.</p>
+</section>
+<section id="cross-check-the-category-view" class="level2">
+<h2 class="anchored" data-anchor-id="cross-check-the-category-view">3. Cross-check: the category view</h2>
+<p>As a top-down check, I modelled weekly <em>category</em> sales for 8 categories with a Bayesian marketing mix model (PyMC-Marketing). It has three levers (discount rate, mailers, displays) and accounts for carryover and diminishing returns.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="discount-roi.png" class="img-fluid figure-img" alt="Dot-and-interval chart of discount ROI for 8 grocery categories. Only frozen pizza has a mean above the break-even line of 1 (1.24); the others range from 0.23 for bread to 0.74 for cheese."></p>
+<figcaption>Margin returned per dollar of retailer discount, by category (Bayesian MMM, 94% credible intervals).</figcaption>
+</figure>
+</div>
+<ul>
+<li>Discount ROI is <strong>below 1 in 7 of 8 categories</strong>. Soft drinks return about $0.69 per $1 of discount. Only frozen pizza is above break-even (1.24), and even there the interval is wide.</li>
+<li>Displays look cheap to break even on (roughly $0.005–0.08 per placement). That hints at moving some discount money into displays, depending on costs I don’t have.</li>
+<li><strong>Both models rank the categories the same way.</strong> But the category-level effect is only <strong>43–55%</strong> of the product-level one for bread, cheese and soft drinks (19% for deli meats). That fits with discounts partly stealing sales from other products in the same category (cannibalisation). So the optimiser’s gain is probably about half what step 2 says.</li>
+<li>Model health: 0 divergences, max r-hat 1.008, R² 0.44–0.64 for 7 of 8 categories.</li>
+</ul>
+</section>
+<section id="test-how-would-we-prove-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="test-how-would-we-prove-it-works">4. Test: how would we prove it works?</h2>
+<p>A model’s prediction isn’t proof. Before rolling out the calendar, a retailer would want to test it, so I designed the experiment:</p>
+<ul>
+<li><strong>Design:</strong> randomly split stores 50/50. Treatment stores run the optimised calendar, and control stores keep current practice.</li>
+<li><strong>Unit:</strong> stores, not shoppers, because a promo calendar applies to everyone who shops in a store. The data has 582 stores. The 137 planned products sell in 115 of them, and 84 have enough weekly sales to include.</li>
+<li><strong>Metric:</strong> weekly promo margin per store on the planned products.</li>
+<li><strong>Analysis:</strong> compare the groups with a t-test, using <strong>CUPED</strong> to adjust for each store’s margin in the 8 weeks before the test. Big stores stay big, so removing that predictable part cuts the noise.</li>
+</ul>
+<p>Then I checked the design on <strong>real history</strong>: 84 stores, with 1,000 simulated tests per scenario.</p>
+<p><strong>Is the analysis trustworthy?</strong> I ran “A/A tests”: random splits with no real change. The test raised a false alarm 4–6% of the time, which matches the 5% it should.</p>
+<p><strong>How big an effect could it detect?</strong> I added known lifts to the treatment stores and counted how often the test caught them:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="test-power.png" class="img-fluid figure-img" alt="Line chart of test power versus true lift. With CUPED, power rises from 5% at no lift to 63% at 10% and 88% at 15%; without CUPED it only reaches 40% at 15%. The optimiser's predicted gain of 1.6 to 3.2% sits where power is about 10%."></p>
+<figcaption>Chance an 8-week test detects a given true lift, with and without CUPED (1,000 simulations each, real store data).</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Smallest lift detectable 80% of the time (8 weeks, CUPED)</td>
+<td><strong>≈13%</strong> (12% at 12 weeks, 15% at 4 weeks)</td>
+</tr>
+<tr class="even">
+<td>Without CUPED</td>
+<td>never reaches 80%, even at a 15% lift</td>
+</tr>
+<tr class="odd">
+<td>Optimiser’s predicted gain vs.&nbsp;current practice</td>
+<td><strong>≈3%</strong> (≈1.6% if step 3 is right)</td>
+</tr>
+<tr class="even">
+<td>Chance of detecting 3% with this test</td>
+<td><strong>≈10%</strong></td>
+</tr>
+<tr class="odd">
+<td>Stores needed to detect 3%</td>
+<td>≈1,500</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What this means:</strong></p>
+<ol type="1">
+<li>With these stores, a test would almost always say “no significant effect”, <em>even if the calendar works</em>. That result shouldn’t be read as the calendar failing.</li>
+<li>CUPED matters a lot here. It roughly triples the chance of detecting a real effect.</li>
+<li>The real fix is a bigger or less noisy test: full-store sales instead of a 2,500-household panel (here each store sees only ~100 panel households, while a real store likely serves far more), a metric that pools more categories, a longer test, or a switchback design.</li>
+</ol>
+<p>It’s much better to learn this <em>before</em> running a test than after.</p>
 </section>
 <section id="limitations" class="level2">
 <h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
-<!-- TODO: observational data, confounding assumptions, dataset period, etc. -->
-<p><em>To be added.</em></p>
+<ul>
+<li><strong>Observational data.</strong> The Double ML estimate is causal only if the controls capture everything that drives both promo decisions and sales.</li>
+<li><strong>No cost data.</strong> Margin is assumed to be 30% of shelf price, and suppliers are assumed to fund 50% of the discount. Display and mailer costs are unknown.</li>
+<li><strong>The optimiser likely over-credits discounts.</strong> Cannibalisation is handled only by a simple category cap, and pull-forward (shoppers stocking up) only by a “no back-to-back promos” rule.</li>
+<li><strong>The test simulation is simplified.</strong> It applies the lift evenly to the store metric, and panel stores only see panel households’ purchases. The method transfers to a real retailer, but the store count doesn’t.</li>
+<li>The MMM has 82 weeks per category, and mailers and displays often run together, so their separate effects are uncertain.</li>
+</ul>
+</section>
+<section id="whats-next" class="level2">
+<h2 class="anchored" data-anchor-id="whats-next">What’s next</h2>
+<ul>
+<li>Scale the product-level effects by a category-level factor, so the optimiser stops over-crediting discounts.</li>
+<li>Model pull-forward directly instead of using a rule.</li>
+<li>Extend the test design with a switchback (alternating weeks) and stratified store assignment, and compare their power.</li>
+</ul>
 
 
 </section>

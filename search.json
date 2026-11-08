@@ -4,7 +4,7 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Promo Optimization Engine\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nBayesian\n\n\n\nCausal uplift modelling, promo calendar optimisation and a Bayesian marketing mix model on the Dunnhumby Complete Journey dataset.\n\n\n\n\n\nNo matching items"
+    "text": "Promo Optimization Engine\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\nWhich promotions actually create extra sales, how should a retailer schedule them, and how would you prove it works? Double ML, promo calendar optimisation, a Bayesian MMM…\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html",
@@ -39,27 +39,55 @@
     "href": "projects/promo-optimization-engine/index.html",
     "title": "Promo Optimization Engine",
     "section": "",
-    "text": "WarningWork in progress\n\n\n\nThis page is a placeholder. Write-up and results coming soon.\nCode: GitHub repository"
+    "text": "Code: github.com/Saminay786/promo-optimization-engine\nTL;DR:"
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#overview",
-    "href": "projects/promo-optimization-engine/index.html#overview",
+    "objectID": "projects/promo-optimization-engine/index.html#the-problem",
+    "href": "projects/promo-optimization-engine/index.html#the-problem",
     "title": "Promo Optimization Engine",
-    "section": "Overview",
-    "text": "Overview\nWhich promotions actually create incremental sales, and how should a retailer schedule them? This project works through that question with three components, using the Dunnhumby The Complete Journey household-level transaction data: \n\nCausal uplift modelling: estimate the incremental effect of promotions (display, mailer, coupon) on purchase behaviour, rather than raw lift.\nPromo calendar optimisation: use the uplift estimates to choose which products to promote and when, subject to budget and frequency constraints.\nBayesian marketing mix model: estimate channel-level contributions with adstock and saturation, with uncertainty intervals."
+    "section": "The problem",
+    "text": "The problem\nRetailers spend a lot on promotions. The common way to judge them is “units sold during the promo vs. a normal week”. That number mixes up three things: the discount itself, the display or mailer that usually comes with it, and sales that would have happened anyway. Plan from it, and you over-invest in discounts.\nThe project works through four questions in order:\n\n\n\n\n\n\n\n\nStep\nQuestion\nMethod\n\n\n\n\n1. Measure\nHow much extra volume does a discount actually cause?\nDouble Machine Learning\n\n\n2. Decide\nWhich product should get which discount, in which week?\nInteger optimisation (CP-SAT)\n\n\n3. Cross-check\nDoes a top-down view agree?\nBayesian marketing mix model\n\n\n4. Test\nHow would we prove it works in real stores?\nA/B test design: power simulation + CUPED\n\n\n\nData: dunnhumby’s The Complete Journey, with two years of grocery transactions from ~2,500 households plus display and mailer data. I used the 137 top-revenue products over 99 weeks (11,892 product-weeks), excluding fuel, gift cards and miscellaneous items."
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#results",
-    "href": "projects/promo-optimization-engine/index.html#results",
+    "objectID": "projects/promo-optimization-engine/index.html#measure-what-does-a-discount-really-cause",
+    "href": "projects/promo-optimization-engine/index.html#measure-what-does-a-discount-really-cause",
     "title": "Promo Optimization Engine",
-    "section": "Results",
-    "text": "Results\n\nResults to be added."
+    "section": "1. Measure: what does a discount really cause?",
+    "text": "1. Measure: what does a discount really cause?\nI built a product × week panel. The treatment is discount depth. The controls are display/mailer exposure, past sales, seasonality and how much else in the category was on promo. I then estimated the effect with Double ML (EconML LinearDML, LightGBM, 5-fold cross-fitting) and compared it with a naive estimate and a placebo test.\n\n\n\n\nElasticity θ\nWhat 10% off does\n\n\n\n\nNaive (no controls)\n3.49\n+42% units\n\n\nDouble ML\n2.51 (95% CI 2.18–2.85)\n+29% units\n\n\nPlacebo test\n0.01\nno effect, as expected\n\n\n\nAbout 43.8% of promo volume was non-incremental. Those were sales the retailer would have made anyway."
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#decide-build-the-promo-calendar",
+    "href": "projects/promo-optimization-engine/index.html#decide-build-the-promo-calendar",
+    "title": "Promo Optimization Engine",
+    "section": "2. Decide: build the promo calendar",
+    "text": "2. Decide: build the promo calendar\nThe per-category effects feed an integer program (OR-Tools CP-SAT). It picks a discount (10/20/30% or none) for each product-week, subject to a budget, weekly promo slots, a frequency cap, a per-category cap and no back-to-back promos. I compared it with a common rule of thumb: deepest discount on the top sellers.\nSame $5k budget, 8 weeks, 10 promo slots per week:\n\n\n\n\nIncremental margin\nBudget used\n\n\n\n\n“Deepest discount on top sellers”\n$60\nfull\n\n\nOptimised calendar\n$719\n37% less\n\n\n\nThe rule of thumb loses mostly because it puts deep discounts on products that would sell anyway. Treat the absolute dollar figure with caution: step 3 suggests it’s overstated."
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#cross-check-the-category-view",
+    "href": "projects/promo-optimization-engine/index.html#cross-check-the-category-view",
+    "title": "Promo Optimization Engine",
+    "section": "3. Cross-check: the category view",
+    "text": "3. Cross-check: the category view\nAs a top-down check, I modelled weekly category sales for 8 categories with a Bayesian marketing mix model (PyMC-Marketing). It has three levers (discount rate, mailers, displays) and accounts for carryover and diminishing returns.\n\n\n\nMargin returned per dollar of retailer discount, by category (Bayesian MMM, 94% credible intervals).\n\n\n\nDiscount ROI is below 1 in 7 of 8 categories. Soft drinks return about $0.69 per $1 of discount. Only frozen pizza is above break-even (1.24), and even there the interval is wide.\nDisplays look cheap to break even on (roughly $0.005–0.08 per placement). That hints at moving some discount money into displays, depending on costs I don’t have.\nBoth models rank the categories the same way. But the category-level effect is only 43–55% of the product-level one for bread, cheese and soft drinks (19% for deli meats). That fits with discounts partly stealing sales from other products in the same category (cannibalisation). So the optimiser’s gain is probably about half what step 2 says.\nModel health: 0 divergences, max r-hat 1.008, R² 0.44–0.64 for 7 of 8 categories."
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#test-how-would-we-prove-it-works",
+    "href": "projects/promo-optimization-engine/index.html#test-how-would-we-prove-it-works",
+    "title": "Promo Optimization Engine",
+    "section": "4. Test: how would we prove it works?",
+    "text": "4. Test: how would we prove it works?\nA model’s prediction isn’t proof. Before rolling out the calendar, a retailer would want to test it, so I designed the experiment:\n\nDesign: randomly split stores 50/50. Treatment stores run the optimised calendar, and control stores keep current practice.\nUnit: stores, not shoppers, because a promo calendar applies to everyone who shops in a store. The data has 582 stores. The 137 planned products sell in 115 of them, and 84 have enough weekly sales to include.\nMetric: weekly promo margin per store on the planned products.\nAnalysis: compare the groups with a t-test, using CUPED to adjust for each store’s margin in the 8 weeks before the test. Big stores stay big, so removing that predictable part cuts the noise.\n\nThen I checked the design on real history: 84 stores, with 1,000 simulated tests per scenario.\nIs the analysis trustworthy? I ran “A/A tests”: random splits with no real change. The test raised a false alarm 4–6% of the time, which matches the 5% it should.\nHow big an effect could it detect? I added known lifts to the treatment stores and counted how often the test caught them:\n\n\n\nChance an 8-week test detects a given true lift, with and without CUPED (1,000 simulations each, real store data).\n\n\n\n\n\n\n\n\n\n\nAnswer\n\n\n\n\nSmallest lift detectable 80% of the time (8 weeks, CUPED)\n≈13% (12% at 12 weeks, 15% at 4 weeks)\n\n\nWithout CUPED\nnever reaches 80%, even at a 15% lift\n\n\nOptimiser’s predicted gain vs. current practice\n≈3% (≈1.6% if step 3 is right)\n\n\nChance of detecting 3% with this test\n≈10%\n\n\nStores needed to detect 3%\n≈1,500\n\n\n\nWhat this means:\n\nWith these stores, a test would almost always say “no significant effect”, even if the calendar works. That result shouldn’t be read as the calendar failing.\nCUPED matters a lot here. It roughly triples the chance of detecting a real effect.\nThe real fix is a bigger or less noisy test: full-store sales instead of a 2,500-household panel (here each store sees only ~100 panel households, while a real store likely serves far more), a metric that pools more categories, a longer test, or a switchback design.\n\nIt’s much better to learn this before running a test than after."
   },
   {
     "objectID": "projects/promo-optimization-engine/index.html#limitations",
     "href": "projects/promo-optimization-engine/index.html#limitations",
     "title": "Promo Optimization Engine",
     "section": "Limitations",
-    "text": "Limitations\n\nTo be added."
+    "text": "Limitations\n\nObservational data. The Double ML estimate is causal only if the controls capture everything that drives both promo decisions and sales.\nNo cost data. Margin is assumed to be 30% of shelf price, and suppliers are assumed to fund 50% of the discount. Display and mailer costs are unknown.\nThe optimiser likely over-credits discounts. Cannibalisation is handled only by a simple category cap, and pull-forward (shoppers stocking up) only by a “no back-to-back promos” rule.\nThe test simulation is simplified. It applies the lift evenly to the store metric, and panel stores only see panel households’ purchases. The method transfers to a real retailer, but the store count doesn’t.\nThe MMM has 82 weeks per category, and mailers and displays often run together, so their separate effects are uncertain."
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#whats-next",
+    "href": "projects/promo-optimization-engine/index.html#whats-next",
+    "title": "Promo Optimization Engine",
+    "section": "What’s next",
+    "text": "What’s next\n\nScale the product-level effects by a category-level factor, so the optimiser stops over-crediting discounts.\nModel pull-forward directly instead of using a rule.\nExtend the test design with a switchback (alternating weeks) and stratified store assignment, and compare their power."
   }
 ]
