@@ -1,6 +1,6 @@
 ---
 title: "Samina Yasmin"
-subtitle: "Decision Science Analyst · Turning data into decisions"
+subtitle: "Decision Science Analyst"
 # image: profile.jpg
 about:
   template: jolla
@@ -13,11 +13,9 @@ about:
       href: https://www.linkedin.com/in/samina-yasmin-800a2614a/
 ---
 
-Hi, I'm Samina. I work as a decision science analyst at Accenture, mostly on pricing and forecasting problems. Before that I did research on how people behave and make choices, and that still shapes how I think about data.
+Hi, I'm Samina. I work on pricing, forecasting and demand models. Before this, I did an MS (Research) at IIT Madras, where I ran survey studies and tested behavioural hypotheses with statistical models.
 
-What I enjoy most is helping people make better decisions with data, whether that's pricing, promotions or figuring out whether something actually worked.
-
-This is where I share projects and things I'm learning along the way. Some of it will be rough around the edges, and that's okay.
+I'm interested in pricing, causal inference and experiments. I use this site to write up projects I've worked on and things I'm learning.
 
 ## Education
 
