@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "Promo Optimization Engine\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nBayesian\n\n\n\nCausal uplift modelling, promo calendar optimisation and a Bayesian marketing mix model on the Dunnhumby Complete Journey dataset.\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "No matching items"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Samina Yasmin",
+    "section": "",
+    "text": "Hi, I’m Samina. I work as a decision science analyst at Accenture, mostly on pricing and forecasting problems. Before that I did research on how people behave and make choices, and that still shapes how I think about data.\nWhat I enjoy most is helping people make better decisions with data, whether that’s pricing, promotions or figuring out whether something actually worked.\nThis is where I share projects and things I’m learning along the way. Some of it will be rough around the edges, and that’s okay."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Samina Yasmin",
+    "section": "Education",
+    "text": "Education\nIIT Madras | MS (Research), Department of Management Studies\nResearch at the intersection of industrial-organizational psychology and quantitative methods: designing survey-based studies and testing behavioral hypotheses with statistical models, including moderation, mediation and conditional process analysis (SPSS, PROCESS).\nUniversity of Mumbai | B.Tech, Electronics Engineering | 2021"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "Samina Yasmin",
+    "section": "Experience",
+    "text": "Experience\nAccenture Strategy & Consulting | Decision Science Analyst | 2025 – present\nBuilding pricing, forecasting and demand-sourcing models for industrial clients.\nAmerican Express, Data Analytics & Risk Tech. Lab (via IIT Madras) | Research Associate | 2023 – 2025"
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html",
+    "href": "projects/promo-optimization-engine/index.html",
+    "title": "Promo Optimization Engine",
+    "section": "",
+    "text": "WarningWork in progress\n\n\n\nThis page is a placeholder. Write-up and results coming soon.\nCode: GitHub repository"
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#overview",
+    "href": "projects/promo-optimization-engine/index.html#overview",
+    "title": "Promo Optimization Engine",
+    "section": "Overview",
+    "text": "Overview\nWhich promotions actually create incremental sales, and how should a retailer schedule them? This project works through that question with three components, using the Dunnhumby The Complete Journey household-level transaction data: \n\nCausal uplift modelling: estimate the incremental effect of promotions (display, mailer, coupon) on purchase behaviour, rather than raw lift.\nPromo calendar optimisation: use the uplift estimates to choose which products to promote and when, subject to budget and frequency constraints.\nBayesian marketing mix model: estimate channel-level contributions with adstock and saturation, with uncertainty intervals."
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#results",
+    "href": "projects/promo-optimization-engine/index.html#results",
+    "title": "Promo Optimization Engine",
+    "section": "Results",
+    "text": "Results\n\nResults to be added."
+  },
+  {
+    "objectID": "projects/promo-optimization-engine/index.html#limitations",
+    "href": "projects/promo-optimization-engine/index.html#limitations",
+    "title": "Promo Optimization Engine",
+    "section": "Limitations",
+    "text": "Limitations\n\nTo be added."
+  }
+]
