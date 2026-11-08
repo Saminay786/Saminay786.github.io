@@ -48,6 +48,17 @@ main h2 {
   border-radius: 6px;
 }
 
+/* jolla centres everything; keep the name/subtitle centred but left-align the body text */
+.quarto-about-jolla main {
+  text-align: left;
+  max-width: 720px;
+  width: 100%;
+}
+
+.quarto-about-jolla main h2 {
+  margin-top: 2rem;
+}
+
 /* ---- Content ---- */
 main table {
   font-size: 0.95rem;
