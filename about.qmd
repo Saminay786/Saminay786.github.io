@@ -1,6 +1,6 @@
 ---
 title: "Samina Yasmin"
-subtitle: "Decision Science Analyst"
+subtitle: "Decision Science Analyst · Accenture S&C"
 # image: profile.jpg
 about:
   template: jolla
