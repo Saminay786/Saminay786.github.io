@@ -1,6 +1,6 @@
 ---
 title: "Samina Yasmin"
-subtitle: "Decision Science Analyst · Accenture S&C"
+subtitle: "Decision Science Analyst"
 # image: profile.jpg
 about:
   template: jolla
@@ -26,7 +26,7 @@ Research at the intersection of industrial-organizational psychology and quantit
 
 ## Experience
 
-**Accenture Strategy & Consulting** | Decision Science Analyst | 2025 – present\
+**Decision Science Analyst** | 2025 – present\
 Building pricing, forecasting and demand-sourcing models for industrial clients.
 
 **American Express, Data Analytics & Risk Tech. Lab (via IIT Madras)** | Research Associate | 2023 – 2025
