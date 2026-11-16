@@ -15,7 +15,9 @@ about:
 
 Hi, I'm Samina. I'm curious about why people pick what they pick, and why models do too.
 
-Here I write about pricing, risk and experiments, and what it takes to turn a model's output into a good decision.
+I started out studying how people behave at work at IIT Madras. Now I study how models behave with data. Turns out they're not so different: both are confident, and both are sometimes wrong.
+
+Here I take things apart to see how they really work, and share what I find.
 
 ## Education
 
