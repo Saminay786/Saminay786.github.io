@@ -10,83 +10,83 @@ aliases:
   - /projects/promo-optimization-engine/index.html
 ---
 
-**Code:** [github.com/Saminay786/promo-optimization-engine](https://github.com/Saminay786/promo-optimization-engine)
+**Code:** [github.com/Saminay786/promo-optimization-engine](https://github.com/Saminay786/promo-optimization-engine) · **Status:** complete
 
-## The 20%-off puzzle
+## What this project is about
+
+Retailers usually judge a promotion by comparing sales during it with a normal week. That number mixes the discount's real effect with everything else happening at the same time.
+
+This project separates them. It measures how many extra sales a discount actually **causes**, uses that to plan **which product gets which discount in which week**, checks the result with a second model, and asks whether a store test could **prove** it.
+
+**What to expect:** a simple example of why promo sales mislead, how each step works, the results, and how much they can be trusted.
+
+## One discount, four stories
 
 A box of cereal goes **20% off** and sales double, from 100 boxes to 200. Success?
 
-Maybe not. That same week, the cereal was probably also on the **front of the weekly flyer** and on a **display at the end of the aisle**. Some of those 200 boxes would have **sold anyway**, just at a lower price. And some shoppers simply **switched** from the cereal next to it.
+Maybe not. That week the cereal was probably also on the **front of the flyer** and on an **end-of-aisle display**. Some of those 200 boxes would have **sold anyway**, now at a lower price. And some shoppers simply **switched** from the cereal next to it.
 
-"Sales went up during the promo" mixes all of that together. Plan from it, and you keep paying for discounts that don't earn their cost.
+All four stories are hidden inside "sales doubled". Plan from that number, and you keep paying for discounts that don't earn their cost.
 
-I used **dunnhumby's *The Complete Journey***, two years of real grocery shopping from about 2,500 households, to pull these apart in four steps:
+## How it works
 
-| Step | Question | Method |
-|---|---|---|
-| **1. Measure** | How much extra does a discount actually *cause*? | Double Machine Learning |
-| **2. Plan** | Which product gets which discount, in which week? | Integer optimisation |
-| **3. Cross-check** | Does the whole-category view agree? | Bayesian marketing mix model |
-| **4. Test** | Could a store test prove it works? | A/B test simulation |
+**Data.** dunnhumby's *The Complete Journey*: two years of grocery shopping by about 2,500 households, with flyer and display records. I used the **137 top-selling products over 99 weeks**.
 
-## Step 1: What does a discount really cause?
+**Measuring the real effect.** I asked: in weeks when the discount was deeper than usual, *beyond what the flyer, display, season and recent sales would explain*, did sales rise more than expected? That's the idea behind **Double ML**: remove everything else first, so the discount only gets credit for what's left. A **placebo test** with shuffled discounts checks that the method doesn't invent effects.
 
-I built a weekly history for the **137 top-selling products** over 99 weeks. Then I asked: in weeks when the discount was deeper than usual, *beyond what the flyer, display, season and recent sales would explain*, did sales rise more than expected? That's the idea behind **Double ML**: strip out everything else first, so the discount only gets credit for what's left.
+**Planning the calendar.** Over 8 weeks with 10 promo slots a week, each product can get 10%, 20% or 30% off, or nothing, under a budget, a cap per category and no back-to-back weeks. Because these rules interact, I used an **integer program** solved with OR-Tools CP-SAT, and compared it with a common rule of thumb: *deepest discount on the best sellers*.
+
+**Checking from the top down.** A **Bayesian marketing mix model** (PyMC-Marketing) of weekly sales for **8 whole categories**, with discount, flyer and display as levers, allowing for lingering effects and diminishing returns.
+
+**Designing the test.** Run the new calendar in half the stores and compare weekly promo margin, using **CUPED** (adjusting for each store's pre-test sales) to cut noise. I simulated it 1,000 times on real store history.
+
+## Results
 
 | | Effect (θ) | What 10% off does |
 |---|---|---|
 | Naive: promo weeks vs. normal weeks | 3.49 | +42% units |
 | **Double ML: other factors removed** | **2.51** (95% CI 2.18–2.85) | **+29% units** |
-| Placebo: discounts randomly shuffled | 0.01 | nothing, as it should |
+| Placebo: discounts shuffled | 0.01 | nothing, as it should |
 
-The naive view overstates the discount by about **40%**, because it gives the discount credit for the flyer and display's work. And **44% of promo-week sales would have happened anyway.**
+The naive view overstates the discount by about **40%**, because it gives the discount credit for the flyer and display. And **44% of promo-week sales would have happened anyway.**
 
-## Step 2: Plan the promo calendar
-
-For 8 weeks with 10 promo slots a week, which product should get 10%, 20% or 30% off, and when? The rules interact (a budget, a cap per category so cereals don't steal from each other, no back-to-back weeks so shoppers don't just stock up), so I set it up as an **integer program** and let a solver (OR-Tools CP-SAT) find the best combination.
-
-The comparison is a common rule of thumb: *deepest discount on the best sellers*. Same rules, same $5k budget:
+**Planning pays.** Same rules, same $5k budget:
 
 | | Extra margin | Budget used |
-|---|---|---|
+|---|---:|---:|
 | "Deepest discount on top sellers" | $60 | all of it |
 | **Optimised calendar** | **$719** | 37% less |
 
-The rule of thumb loses because **30% off only pays for itself on about 1 in 4 products**. On the rest, the discount given on sales that would have happened anyway outweighs the extra sales. The solver saves deep discounts for products that respond strongly, like beer and soft drinks.
-
-## Step 3: Zoom out to the whole category
-
-Step 1 looked at products one at a time. As a check, I modelled weekly sales for **8 whole categories** with a **Bayesian marketing mix model** (PyMC-Marketing). It has three levers (discount, flyer and display), and it allows for effects that linger a week or two and for diminishing returns.
+The rule of thumb loses because **30% off only pays for itself on about 1 in 4 products**. On the rest, the discount given on sales that would have happened anyway outweighs the extra sales.
 
 ![Margin returned per $1 of retailer discount, by category (94% credible intervals).](discount-roi.png){fig-alt="Dot-and-interval chart of discount ROI for 8 grocery categories. Only frozen pizza has a mean above the break-even line of 1 (1.24); the others range from 0.23 for bread to 0.74 for cheese."}
 
-- **Most discounts don't pay for themselves.** In 7 of 8 categories, each $1 of discount brings back less than $1 of margin. Soft drinks return about $0.69. Only frozen pizza clears break-even.
-- **The twist:** both models rank the categories the same way, but the category-level effect is only **about half** the product-level one. That's what **cannibalisation** looks like: when one cereal is discounted, part of its jump is taken from the cereal next to it. The category total rises by less than the product does.
-- **So Step 2's $719 is probably about twice too high.** The *comparison* still holds, since both plans use the same estimates, but the dollar figure is optimistic.
+**Most discounts don't pay for themselves.** In 7 of 8 categories, each $1 of discount brings back less than $1 of margin. Soft drinks return about $0.69, and only frozen pizza clears break-even.
 
-## Step 4: Could a store test even prove it?
+**A surprise.** Both models rank the categories the same way, but the category-level effect is only **about half** the product-level one. That's **cannibalisation**: when one cereal is discounted, part of its jump is taken from the cereal next to it. So the $719 above is probably **about twice too high**. The comparison still holds, since both plans use the same estimates, but the dollar figure is optimistic.
 
-A prediction isn't proof. So I designed the test a retailer would run: split stores 50/50, run the new calendar in half, and compare weekly promo margin, using **CUPED** (adjusting for how each store did before the test) to cut the noise. Then I simulated it **1,000 times on real store history**:
+**Could a test prove it?**
 
 ![Chance that an 8-week test detects a given true lift, with and without CUPED.](test-power.png){fig-alt="Line chart of test power versus true lift. With CUPED, power rises from 5% at no lift to 63% at 10% and 88% at 15%; without CUPED it only reaches 40% at 15%. The optimiser's predicted gain of 1.6 to 3.2% sits where power is about 10%."}
 
-- **The test is fair:** with no real change, it raised a false alarm about 5% of the time, exactly as designed.
-- **But it's too small.** With 84 usable stores, it reliably detects only lifts of about **13% or more**. The calendar is expected to add about **3%**, and this test would catch that only about **10%** of the time.
-- **CUPED roughly triples** the chance of catching a real effect.
+The test is fair (about 5% false alarms with no real change), but with 84 usable stores it reliably detects only lifts of **13% or more**. The calendar is expected to add about **3%**, which it would catch only about **10%** of the time, even with CUPED tripling its power. So a "not significant" result **wouldn't mean the calendar failed**. Proving 3% would need about 1,500 stores.
 
-So a "not significant" result **wouldn't mean the calendar failed**, only that the test couldn't see it. Proving a 3% lift would need about 1,500 stores, a longer test or a less noisy metric. Much better to know that *before* running it.
+## Is this new?
 
-## What I'd tell a promo team
+No, not as an idea. Each piece is well established, and this project applies them rather than inventing them:
 
-1. **Judge a promo by the sales it creates, not the sales it records.** Almost half of promo volume was going to happen anyway.
-2. **Deeper isn't better.** Most categories lost money on deeper discounts. Save them for the few products that really respond.
-3. **Check product-level wins at category level.** Part of every "uplift" is stolen from the shelf next to it.
-4. **Size the test before you run it.** Otherwise a "no effect" result can kill a good idea.
+- **Double ML:** Chernozhukov et al., *Double/Debiased Machine Learning for Treatment and Structural Parameters* (The Econometrics Journal, 2018).
+- **Where the promo bump comes from:** van Heerde, Leeflang & Wittink, *Decomposing the Sales Promotion Bump with Store Data* (Marketing Science, 2004). They found that, on average, about a third of the bump comes from shoppers switching brands.
+- **Promo planning as an integer program:** Cohen et al., *The Impact of Linear Optimization on Promotion Planning* (Operations Research, 2017). They estimated a potential profit gain of about 3%, close to the gain my optimiser predicts.
+- **Marketing mix models with carryover and diminishing returns:** Google, *Bayesian Methods for Media Mix Modeling with Carryover and Shape Effects* (2017).
+- **CUPED:** Deng, Xu, Kohavi & Walker, *Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data* (WSDM 2013).
 
-## Limitations
+What this project adds is small and practical: it connects the four steps on one public dataset, uses a second model to **catch the first one's overstatement**, and checks **before** running a test whether that test could detect the predicted gain.
 
-The data is observational, so the Double ML result holds only if I've measured what drives both promo decisions and sales. There's **no cost data**: margin (30% of price), supplier funding (50% of the discount) and display costs are assumptions. Cannibalisation and stock-piling are handled with simple rules. And with only a 2,500-household panel, a real retailer's full store sales would make the test far more powerful.
+## Limitations and next steps
 
-**Next:** scale product-level effects to category level before optimising, model stock-piling directly, and compare other test designs, such as alternating weeks.
+The data is observational, so the Double ML result holds only if I've measured what drives both promo decisions and sales. There's no cost data: margin (30% of price), supplier funding (50% of the discount) and display costs are assumptions. Cannibalisation and stock-piling are handled with simple rules, and the 2,500-household panel makes the test far weaker than a real retailer's full store sales would. Next, I'd scale product-level effects to category level before optimising, model stock-piling directly, and compare other test designs, such as alternating weeks.
+
+**The takeaway:** judge a promotion by the sales it *creates*, not the sales it *records*. Almost half of promo volume was going to happen anyway.
 
 Full code, results and every number above are in the [GitHub repo](https://github.com/Saminay786/promo-optimization-engine).
