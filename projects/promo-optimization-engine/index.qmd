@@ -8,8 +8,6 @@ image: discount-roi.png
 
 **Code:** [github.com/Saminay786/promo-optimization-engine](https://github.com/Saminay786/promo-optimization-engine)
 
-**TL;DR:**
-
 - **Discounts work, but less than they appear to.** After controlling for displays, mailers and seasonality, the effect drops by about 30%, and 44% of promo volume would have sold anyway.
 - **Planning with corrected numbers pays.** An optimised promo calendar beats the usual "deepest discount on top sellers" rule on the same budget.
 - **At category level, most discounts don't pay for themselves** (7 of 8 categories).

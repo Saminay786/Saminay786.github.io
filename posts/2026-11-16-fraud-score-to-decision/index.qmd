@@ -10,8 +10,6 @@ image: cost_by_policy.png
 
 **Code:** [github.com/Saminay786/transaction-risk-decision-framework](https://github.com/Saminay786/transaction-risk-decision-framework) · **Status:** in progress
 
-**TL;DR:**
-
 - **A fraud score isn't a decision.** The usual rule, "decline if the score is above 0.5", treats a €2 and a €2,000 transaction the same.
 - **Choosing the cheapest action per transaction works better.** Approve, review or decline, whichever has the lowest expected € cost. On the test period it cut total cost per 1,000 transactions from **€89.8 to €69.4** and stopped **68%** of fraud € instead of 49%.
 - **But the sample is small.** With only 75 frauds in the test window, the saving against the 0.5 rule has a 95% interval of **−€352 to €3,493**. It points the right way but isn't proven.
