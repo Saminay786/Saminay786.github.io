@@ -1,6 +1,6 @@
 ---
-title: "From a fraud score to a decision"
-subtitle: "Approve, review or decline: choosing the cheapest action per transaction, not the best AUC"
+title: "The €3 Coffee and the €900 Laptop"
+subtitle: "Why the same fraud score should lead to different decisions, and how to make them"
 description: "A fraud model says how risky a transaction is. It doesn't say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals."
 author: "Samina Yasmin"
 date: 2026-11-16
