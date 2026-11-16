@@ -7,11 +7,53 @@
     "text": "Promo Optimization Engine\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\nWhich promotions actually create extra sales, how should a retailer schedule them, and how would you prove it works? Double ML, promo calendar optimisation, a Bayesian MMM…\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Blog",
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html",
+    "title": "From a fraud score to a decision",
     "section": "",
-    "text": "No matching items"
+    "text": "Code: github.com/Saminay786/transaction-risk-decision-framework · Status: in progress\nTL;DR:"
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#where-this-comes-from",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#where-this-comes-from",
+    "title": "From a fraud score to a decision",
+    "section": "Where this comes from",
+    "text": "Where this comes from\nDuring my Master’s at IIT Madras I worked on Credit Default and Fraud Risk Prediction (American Express – IIT Madras, 2022). It was a classic modelling project: cleaning, KNN imputation, SMOTE-Tomek to balance the classes, stratified K-fold, and seven models compared on ROC-AUC and F1. XGBoost came out on top.\nThat project answered “how risky is this case?” A risk team needs the next answer: “what do we do about it, and what does it cost?” This project is that next step."
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#the-problem",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#the-problem",
+    "title": "From a fraud score to a decision",
+    "section": "The problem",
+    "text": "The problem\nA card issuer sees a transaction and has three options:\n\n\n\n\n\n\n\n\nAction\nIf it’s fraud\nIf it’s legit\n\n\n\n\nApprove\nlose the amount + chargeback costs\nnothing lost\n\n\nReview (analyst checks it)\nanalyst cost; most fraud is caught\nanalyst cost + a delayed customer\n\n\nDecline\nfraud stopped\nlost margin + an annoyed customer\n\n\n\nReviews are limited: there are only so many analysts. So the real question is which action is cheapest for this transaction, given its risk, its amount and the review budget."
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#approach",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#approach",
+    "title": "From a fraud score to a decision",
+    "section": "Approach",
+    "text": "Approach\nData: the public ULB credit-card dataset. It has 284,807 European card transactions over two days, 492 of them fraud (0.17%). The features are anonymised, which suits this project: the focus is the decision, not feature engineering.\n1. Split by time, not at random. Train on the first 60% of the timeline, tune on the next 20%, test on the last 20%. That mimics deploying a model and seeing what happens next.\n2. A plain model, calibrated. LightGBM, with no resampling this time. SMOTE helps F1, but it inflates predicted probabilities, and this project uses the probabilities as real numbers in a cost formula. I checked calibration (isotonic vs Platt scaling) on held-out data.\n3. A cost for each action. With p = calibrated fraud probability and A = amount:\ncost(approve) = p × (A + chargeback overhead)\ncost(review)  = analyst cost + p × (missed share) × (A + overhead) + (1 − p) × customer friction\ncost(decline) = (1 − p) × (lost margin on A + fixed false-decline cost)\nThe cost inputs (€5 per review, 90% of fraud caught on review, €15 chargeback overhead, 3% margin + €10 per false decline, €1 friction per legit review, reviews capped at 1% of transactions) are assumptions kept in one config file. In a real team, Finance and Ops would supply them.\n4. Four policies, compared on the same test period.\n\n\n\n\n\n\n\nPolicy\nRule\n\n\n\n\nP0\napprove everything (baseline)\n\n\nP1\ndecline if p &gt; 0.5 (the common default)\n\n\nP2\ntwo thresholds, review band + decline band, tuned on validation\n\n\nP3\nper transaction, pick the action with the lowest expected cost; respect the review cap"
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#results",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#results",
+    "title": "From a fraud score to a decision",
+    "section": "Results",
+    "text": "Results\n\n\n\nTotal cost per 1,000 test transactions, with 95% bootstrap intervals.\n\n\n\n\n\n\n\n\n\n\n\nP1: decline if p &gt; 0.5\nP3: cheapest action\n\n\n\n\nCost per 1,000 transactions\n€89.8\n€69.4\n\n\nShare of fraud € stopped\n49.0%\n68.2%\n\n\nFraud € still getting through\n€3,941\n€2,455\n\n\nManual reviews used\n0\n33 (cap: 569)\n\n\nSaving vs approve-all [95% CI]\n€3,737 [€538, €7,769]\n€4,899 [€1,307, €9,362]\n\n\n\nWhat’s going on: P3 uses the amount. A medium-risk €900 transaction is worth an analyst’s €5. A medium-risk €3 transaction isn’t. A single probability cut-off can’t make that distinction.\nHow sure are we? I resampled the test set 1,000 times. P3 beats approve-all in 99.7% of resamples. It beats the 0.5 rule in 85% of them, so the interval for that saving still includes zero. With 75 frauds, one large fraud can swing a total. I’d treat this as a strong case for a shadow pilot, not a booked saving.\nThe tuned policy didn’t hold up. P2’s thresholds were tuned on just 33 validation frauds and settled on “decline above 0.56, no reviews”, slightly worse than P1 on test. P3 has no thresholds to tune on fraud labels; it only needs a calibrated score. When labels are scarce, that’s a real advantage.\n\nHow sensitive is this to review cost?\n\n\n\nP2’s tuned thresholds, test cost and reviews used as the cost of one review goes from €1 to €20.\n\n\nAs reviews get more expensive, P3 simply uses fewer of them (133 at €1 down to 4 at €20), and its cost stays between €67 and €70 per 1,000. One honest exception: at €1 per review, the tuned P2 does beat P3.\n\n\nThe trade-off a risk leader actually manages\n\n\n\nResidual fraud exposure vs number of legit customers affected, per 1,000 transactions.\n\n\nEvery policy is a point on a loss-vs-friction curve: fraud € let through against good customers inconvenienced. P3 accepts slightly more friction (about 0.75 legit customers per 1,000 reviewed or declined) to cut residual fraud by about 38% against P1."
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations",
+    "title": "From a fraud score to a decision",
+    "section": "Limitations",
+    "text": "Limitations\n\nFew frauds. 75 in the test window, so intervals are wide.\nCosts are assumptions. The ranking of policies depends on them.\nTwo days of anonymised data. No seasonality, no card or user IDs, so no control for the same card appearing in train and test.\nLabels arrive instantly here. In real life, chargebacks take weeks."
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#whats-next",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#whats-next",
+    "title": "From a fraud score to a decision",
+    "section": "What’s next",
+    "text": "What’s next\n\nMove the same decision layer to the larger IEEE-CIS fraud dataset, with user-level splits to control leakage.\nSimulate label delay and see how quickly a policy goes stale.\nEstimate the review catch rate by risk band instead of assuming 90% everywhere.\n\nThe full write-up, including the formulas, assumptions table and a one-page decision memo, is in the GitHub repo."
   },
   {
     "objectID": "about.html",
@@ -33,6 +75,13 @@
     "title": "Samina Yasmin",
     "section": "Experience",
     "text": "Experience\nAccenture Strategy & Consulting | Decision Science Analyst | 2025 – present\nBuilding pricing, forecasting and demand-sourcing models for industrial clients.\nAmerican Express, Data Analytics & Risk Tech. Lab (via IIT Madras) | Research Associate | 2023 – 2025"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "From a fraud score to a decision\n\n\nApprove, review or decline: choosing the cheapest action per transaction, not the best AUC\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "projects/promo-optimization-engine/index.html",
