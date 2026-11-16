@@ -9,56 +9,56 @@
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "",
     "text": "Code: github.com/Saminay786/transaction-risk-decision-framework · Status: in progress"
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#what-this-project-is-about",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#what-this-project-is-about",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "What this project is about",
     "text": "What this project is about\nBanks score every card transaction for fraud risk. But a score doesn’t stop fraud by itself. Someone still has to decide: approve the payment, send it to an analyst to review, or decline it.\nThis project builds that decision step. It combines the fraud probability, the transaction amount and the cost of each possible mistake, then picks the cheapest action for each transaction, without exceeding the number of reviews analysts can handle.\nWhat to expect: a simple example of why a score isn’t enough, how each action is priced, four ways of deciding compared on unseen data, and how much we can trust the result."
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#how-this-differs-from-my-iit-madras-project",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#how-this-differs-from-my-iit-madras-project",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "How this differs from my IIT Madras project",
     "text": "How this differs from my IIT Madras project\nI first worked on this problem in a coursework project at IIT Madras: Credit Default and Fraud Risk Prediction (American Express – IIT Madras, 2022). I cleaned the data, balanced the classes with SMOTE-Tomek, and compared seven models. XGBoost did best on ROC-AUC and F1.\nThat project asked “how risky is this case?” This one asks what a risk team needs next: “what do we do about it, and what will it cost?”\n\n\n\n\n\n\n\n\n\nIIT Madras coursework\nThis project\n\n\n\n\nOutput\nA risk score\nApprove, review or decline\n\n\nRare fraud cases\nOversampled\nLeft as they are, so probabilities stay realistic\n\n\nTesting\nRandom splits\nTrain on the past, test on a later period\n\n\nJudged by\nROC-AUC, F1\n€ cost, fraud caught, customers affected"
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#two-transactions-same-score",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#two-transactions-same-score",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "Two transactions, same score",
     "text": "Two transactions, same score\nA €3 coffee and a €900 laptop both get a 10% fraud score. The common rule, “decline if the score is above 0.5”, approves both.\nBut if the laptop is fraud, the bank loses €900 plus fees. An analyst check costs about €5, which is clearly worth it for the laptop and not for the coffee. Same score, different right answer."
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#how-it-works",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#how-it-works",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "How it works",
     "text": "How it works\nData. The public ULB credit-card dataset: 284,807 European card transactions over two days, 492 of them fraud (0.17%).\nModel. LightGBM, trained on the first 60% of the timeline and tested on the last 20%, as it would be used in real life. Unlike my coursework project, I didn’t oversample fraud. Oversampling inflates the scores, so a “10%” stops meaning 10%. Here the probability feeds a € calculation, so it has to be honest.\nPricing each action. With p = fraud probability and A = amount:\napprove = p × (A + fees)\nreview  = analyst cost + p × (share analysts miss) × (A + fees) + (1 − p) × customer delay\ndecline = (1 − p) × (lost margin + cost of an annoyed customer)\nFor the laptop: €92 to approve, €15 to review, €33 to decline, so it goes to review. For the coffee: €1.80 to approve, so it goes through. The cost inputs (€5 per review, 90% of fraud caught on review, and so on) are assumptions that a real bank’s Finance team would supply.\nFour ways of deciding:\n\nP0: approve everything (the cost of doing nothing)\nP1: decline if p &gt; 0.5 (the common default)\nP2: two cut-offs, tuned on past data\nP3: the cheapest action per transaction, within a review cap of 1%"
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#results",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#results",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "Results",
     "text": "Results\n\n\n\nTotal cost per 1,000 test transactions. Black lines show the 95% range.\n\n\n\n\n\n\nP1: decline if p &gt; 0.5\nP3: cheapest action\n\n\n\n\nCost per 1,000 transactions\n€89.8\n€69.4\n\n\nShare of fraud € stopped\n49%\n68%\n\n\nAnalyst reviews used\n0\n33 (of 569 allowed)\n\n\n\nP3 wins by doing exactly what the laptop example suggests: it spends a few reviews on risky, expensive transactions that the 0.5 rule lets through.\nHow sure are we? The test period has only 75 frauds, so I resampled it 1,000 times. P3 beats approving everything in 99.7% of resamples, and beats the 0.5 rule in 85%. The second gain is promising but not proven: its 95% range is −€352 to €3,493. I’d use it to justify a pilot, not to promise savings.\nA surprise. P2, the tuned cut-offs, did slightly worse than the plain 0.5 rule. It was tuned on just 33 frauds, so it mostly fitted noise. P3 has nothing to tune, which helps when fraud examples are scarce.\nIf analysts cost more? Raising the review cost from €1 to €20, P3 uses fewer reviews (133 down to 4), and its cost stays around €67–70 per 1,000, against €90 for the 0.5 rule."
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#is-this-new",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#is-this-new",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "Is this new?",
     "text": "Is this new?\nNo, not as an idea. Making decisions by expected cost is well established, and this project applies it rather than inventing it:\n\nCost-based thresholds: Elkan, The Foundations of Cost-Sensitive Learning (IJCAI 2001).\nCost-based fraud decisions, per transaction: Correa Bahnsen et al., Cost Sensitive Credit Card Fraud Detection Using Bayes Minimum Risk (ICMLA 2013), and their later work on example-dependent costs.\nA “review” option beside yes/no: the reject option, going back to Chow (1970).\nResampling distorts probabilities: Dal Pozzolo et al., Calibrating Probability with Undersampling for Unbalanced Classification (2015). This is from the same ULB group that released the dataset.\nLimited analyst capacity in fraud: Dal Pozzolo et al., Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy (IEEE TNNLS 2018).\n\nWhat this project adds is small and practical: it puts these pieces into one end-to-end pipeline, with three actions, amount-based costs, a review cap and a test on a later time period. It also reports how uncertain the gain is, which most public work on this dataset skips, and shows that tuned cut-offs can fail when fraud examples are few."
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations-and-next-steps",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations-and-next-steps",
-    "title": "The €3 Coffee and the €900 Laptop",
+    "title": "Same Fraud Score, Different Decision",
     "section": "Limitations and next steps",
     "text": "Limitations and next steps\nThe costs are assumptions, there are few frauds, and the data covers only two days with no customer IDs. Next, I’d move the same decision layer to the larger IEEE-CIS dataset, keep each customer in only one of training or testing, and simulate chargebacks arriving weeks later, as they do in practice.\nThe takeaway: a fraud model’s job is to estimate risk. Deciding what to do with that risk is a separate job, and it’s where most of the money is.\nFull details, formulas and a one-page decision memo are in the GitHub repo."
   },
@@ -88,7 +88,7 @@
     "href": "index.html",
     "title": "Blog",
     "section": "",
-    "text": "The €3 Coffee and the €900 Laptop\n\n\nWhy the same fraud score should lead to different decisions, and how to make them\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
+    "text": "Same Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "projects/promo-optimization-engine/index.html",
