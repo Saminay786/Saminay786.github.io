@@ -14,81 +14,46 @@
     "text": "Code: github.com/Saminay786/transaction-risk-decision-framework · Status: in progress"
   },
   {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#what-this-project-is-about",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#what-this-project-is-about",
+    "title": "From a fraud score to a decision",
+    "section": "What this project is about",
+    "text": "What this project is about\nBanks score every card transaction for fraud risk. But a score doesn’t stop fraud by itself. Someone still has to decide: approve the payment, send it to an analyst to review, or decline it.\nThis project builds that decision step. It combines the fraud probability, the transaction amount and the cost of each possible mistake, then picks the cheapest action for each transaction, without exceeding the number of reviews analysts can handle.\nWhat to expect: a simple example of why a score isn’t enough, how each action is priced, four ways of deciding compared on unseen data, and how much we can trust the result."
+  },
+  {
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#how-this-differs-from-my-iit-madras-project",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#how-this-differs-from-my-iit-madras-project",
+    "title": "From a fraud score to a decision",
+    "section": "How this differs from my IIT Madras project",
+    "text": "How this differs from my IIT Madras project\nI first worked on this problem in a coursework project at IIT Madras: Credit Default and Fraud Risk Prediction (American Express – IIT Madras, 2022). I cleaned the data, balanced the classes with SMOTE-Tomek, and compared seven models. XGBoost did best on ROC-AUC and F1.\nThat project asked “how risky is this case?” This one asks what a risk team needs next: “what do we do about it, and what will it cost?”\n\n\n\n\n\n\n\n\n\nIIT Madras coursework\nThis project\n\n\n\n\nOutput\nA risk score\nApprove, review or decline\n\n\nRare fraud cases\nOversampled\nLeft as they are, so probabilities stay realistic\n\n\nTesting\nRandom splits\nTrain on the past, test on a later period\n\n\nJudged by\nROC-AUC, F1\n€ cost, fraud caught, customers affected"
+  },
+  {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#two-transactions-same-score",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#two-transactions-same-score",
     "title": "From a fraud score to a decision",
     "section": "Two transactions, same score",
-    "text": "Two transactions, same score\nTwo card payments arrive at the same moment. One is a €3 coffee. The other is a €900 laptop. The fraud model gives both the same score: a 10% chance of fraud.\nThe most common rule in fraud tutorials is “decline if the score is above 0.5”. By that rule, both are approved, because 10% is well below 50%.\nBut look at what’s at stake:\n\nIf the coffee is fraud, the bank loses about €3.\nIf the laptop is fraud, the bank loses €900 plus chargeback fees.\n\nHaving an analyst check the laptop costs around €5. That’s clearly worth it. Checking the coffee isn’t.\nThe same score can call for different decisions. A fraud model tells you how risky something is. It doesn’t tell you what to do about it. This project is about that second step.\nHere’s what I found:\n\nPicking the cheapest action for each transaction beats a fixed cut-off. On the test period it cut total cost from €89.8 to €69.4 per 1,000 transactions and stopped 68% of fraud € instead of 49%.\nThe data is thin, so I report how sure I am. With only 75 frauds in the test window, the saving against the 0.5 rule could be anywhere from −€352 to €3,493 (95% interval). It points the right way, but it isn’t proven yet.\nFine-tuning a cut-off on a few frauds backfired. A carefully tuned two-threshold rule did slightly worse than the plain 0.5 rule on new data."
+    "text": "Two transactions, same score\nA €3 coffee and a €900 laptop both get a 10% fraud score. The common rule, “decline if the score is above 0.5”, approves both.\nBut if the laptop is fraud, the bank loses €900 plus fees. An analyst check costs about €5, which is clearly worth it for the laptop and not for the coffee. Same score, different right answer."
   },
   {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#where-this-started",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#where-this-started",
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#how-it-works",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#how-it-works",
     "title": "From a fraud score to a decision",
-    "section": "Where this started",
-    "text": "Where this started\nI first worked on fraud during my Master’s at IIT Madras, on Credit Default and Fraud Risk Prediction (American Express – IIT Madras, 2022). That was a classic modelling project. I cleaned the data, filled gaps with KNN imputation, balanced the classes with SMOTE-Tomek, and compared seven models with stratified K-fold cross-validation. XGBoost won on ROC-AUC and F1.\nLooking back, that project stopped at the question “how risky is this case?” A risk team has to go one step further: “so what do we do, and what will it cost?” This project picks up from there."
+    "section": "How it works",
+    "text": "How it works\nData. The public ULB credit-card dataset: 284,807 European card transactions over two days, 492 of them fraud (0.17%).\nModel. LightGBM, trained on the first 60% of the timeline and tested on the last 20%, as it would be used in real life. Unlike my coursework project, I didn’t oversample fraud. Oversampling inflates the scores, so a “10%” stops meaning 10%. Here the probability feeds a € calculation, so it has to be honest.\nPricing each action. With p = fraud probability and A = amount:\napprove = p × (A + fees)\nreview  = analyst cost + p × (share analysts miss) × (A + fees) + (1 − p) × customer delay\ndecline = (1 − p) × (lost margin + cost of an annoyed customer)\nFor the laptop: €92 to approve, €15 to review, €33 to decline, so it goes to review. For the coffee: €1.80 to approve, so it goes through. The cost inputs (€5 per review, 90% of fraud caught on review, and so on) are assumptions that a real bank’s Finance team would supply.\nFour ways of deciding:\n\nP0: approve everything (the cost of doing nothing)\nP1: decline if p &gt; 0.5 (the common default)\nP2: two cut-offs, tuned on past data\nP3: the cheapest action per transaction, within a review cap of 1%"
   },
   {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#three-choices-each-with-a-price",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#three-choices-each-with-a-price",
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#results",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#results",
     "title": "From a fraud score to a decision",
-    "section": "Three choices, each with a price",
-    "text": "Three choices, each with a price\nFor every transaction, a card issuer can do one of three things. Each choice has a cost if it turns out wrong:\n\n\n\n\n\n\n\n\nAction\nIf it’s fraud\nIf it’s legit\n\n\n\n\nApprove\nthe bank loses the amount + chargeback fees\nno cost\n\n\nReview (an analyst checks it)\nanalyst time; most fraud is caught\nanalyst time + a delayed customer\n\n\nDecline\nfraud stopped\nlost sale + an annoyed customer\n\n\n\nThere’s one more real-world limit: analysts are limited. You can’t review everything, so reviews have to go where they matter most.\nThat turns the problem into: for this transaction, given its risk and its amount, which action is cheapest, and do we still have review capacity?"
+    "section": "Results",
+    "text": "Results\n\n\n\nTotal cost per 1,000 test transactions. Black lines show the 95% range.\n\n\n\n\n\n\nP1: decline if p &gt; 0.5\nP3: cheapest action\n\n\n\n\nCost per 1,000 transactions\n€89.8\n€69.4\n\n\nShare of fraud € stopped\n49%\n68%\n\n\nAnalyst reviews used\n0\n33 (of 569 allowed)\n\n\n\nP3 wins by doing exactly what the laptop example suggests: it spends a few reviews on risky, expensive transactions that the 0.5 rule lets through.\nHow sure are we? The test period has only 75 frauds, so I resampled it 1,000 times. P3 beats approving everything in 99.7% of resamples, and beats the 0.5 rule in 85%. The second gain is promising but not proven: its 95% range is −€352 to €3,493. I’d use it to justify a pilot, not to promise savings.\nA surprise. P2, the tuned cut-offs, did slightly worse than the plain 0.5 rule. It was tuned on just 33 frauds, so it mostly fitted noise. P3 has nothing to tune, which helps when fraud examples are scarce.\nIf analysts cost more? Raising the review cost from €1 to €20, P3 uses fewer reviews (133 down to 4), and its cost stays around €67–70 per 1,000, against €90 for the 0.5 rule."
   },
   {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#how-i-built-it",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#how-i-built-it",
+    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations-and-next-steps",
+    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations-and-next-steps",
     "title": "From a fraud score to a decision",
-    "section": "How I built it",
-    "text": "How I built it\nThe data. I used the public ULB credit-card dataset: 284,807 European card transactions over two days, of which 492 (0.17%) are fraud. The features are anonymised, which suits this project. The interesting part here is the decision, not the features.\nStep 1: split by time, like real life. In practice you train a model on the past and use it on the future. So I trained on the first 60% of the timeline, tuned on the next 20%, and kept the last 20% as an untouched test period. Random splits would quietly let the model “see the future”.\nStep 2: a plain model, but with trustworthy probabilities. I used LightGBM, a standard choice. The important change from my 2022 project: no SMOTE this time. Resampling helps F1, but it makes the model think fraud is far more common than it is, so a “10%” score no longer means 10%. Here the probability goes straight into a € calculation, so it has to be honest. I checked this with calibration (Platt scaling vs isotonic regression) on held-out data.\nStep 3: put a price on each action. With p = fraud probability and A = transaction amount:\ncost(approve) = p × (A + chargeback fees)\ncost(review)  = analyst cost + p × (share analysts miss) × (A + fees) + (1 − p) × customer delay\ncost(decline) = (1 − p) × (lost margin on A + cost of an annoyed customer)\nFor the laptop at 10%, that gives about €92 to approve, €15 to review, €33 to decline, so it goes to review. For the coffee: €1.80 to approve, more for anything else, so it goes through.\nThe costs behind these formulas are assumptions I set in one config file: €5 per review, analysts catch 90% of fraud, €15 chargeback fees, 3% lost margin + €10 per wrongly declined customer, €1 delay cost per reviewed legit customer, and reviews capped at 1% of transactions. In a real bank, Finance and Operations would supply these numbers.\nStep 4: compare four ways of deciding on the same test period:\n\n\n\n\n\n\n\nPolicy\nHow it decides\n\n\n\n\nP0\napprove everything (to see what doing nothing costs)\n\n\nP1\ndecline if p &gt; 0.5 (the common default)\n\n\nP2\ntwo cut-offs, one for review and one for decline, tuned on past data\n\n\nP3\nfor each transaction, pick the cheapest action; respect the review cap"
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#what-happened",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#what-happened",
-    "title": "From a fraud score to a decision",
-    "section": "What happened",
-    "text": "What happened\n\n\n\nTotal cost per 1,000 test transactions. The black lines show the 95% range from resampling.\n\n\nDoing nothing (P0) costs €155 per 1,000 transactions. The standard 0.5 rule (P1) cuts that to €90. Choosing per transaction (P3) brings it down to €69.\n\n\n\n\nP1: decline if p &gt; 0.5\nP3: cheapest action\n\n\n\n\nCost per 1,000 transactions\n€89.8\n€69.4\n\n\nShare of fraud € stopped\n49.0%\n68.2%\n\n\nFraud € still getting through\n€3,941\n€2,455\n\n\nAnalyst reviews used\n0\n33 (out of 569 allowed)\n\n\n\nWhere does the gain come from? Exactly the coffee-and-laptop situation. P3 spends a few analyst reviews on risky, expensive transactions that the 0.5 rule would have waved through. It needed only 33 reviews to do it, far below the cap."
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#can-we-trust-the-gain",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#can-we-trust-the-gain",
-    "title": "From a fraud score to a decision",
-    "section": "Can we trust the gain?",
-    "text": "Can we trust the gain?\nHere the honest answer is “partly”. The test window has only 75 frauds, and a single big fraud can move the totals a lot.\nTo measure that uncertainty, I resampled the test period 1,000 times and recalculated each time:\n\nP3 is cheaper than approving everything in 99.7% of resamples. That part is solid.\nP3 is cheaper than the 0.5 rule in 85% of resamples. That’s encouraging, but the 95% range for the saving still includes zero.\n\nSo I wouldn’t present this as “P3 saves €1,162”. I’d present it as a strong case for a shadow pilot: run P3 alongside the current rule, without acting on it, and measure."
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#a-surprise-tuning-made-things-worse",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#a-surprise-tuning-made-things-worse",
-    "title": "From a fraud score to a decision",
-    "section": "A surprise: tuning made things worse",
-    "text": "A surprise: tuning made things worse\nP2 is what many teams would try first: keep simple cut-offs, but tune them on past data. I tuned them on the validation period, which had only 33 frauds. The best setting it found was “decline above 0.56, never review”. On the test period, that did slightly worse than the plain 0.5 rule.\nWith so few frauds, tuning mostly fits noise. P3 sidesteps this because it has no cut-offs to tune. It only needs honest probabilities and the cost assumptions. When fraud labels are scarce, which they usually are, that’s a real advantage."
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#what-if-analysts-cost-more",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#what-if-analysts-cost-more",
-    "title": "From a fraud score to a decision",
-    "section": "What if analysts cost more?",
-    "text": "What if analysts cost more?\nThe €5 review cost is a guess, so I re-ran everything with review costs from €1 to €20:\n\n\n\nHow each policy responds as the cost of one review goes from €1 to €20.\n\n\nP3 adapts on its own. Cheap reviews: it uses more of them (133 at €1). Expensive reviews: it saves them for the riskiest cases (just 4 at €20). Its total cost stays between €67 and €70 throughout, against €90 for the 0.5 rule.\nOne exception I want to be upfront about: at €1 per review, the tuned P2 does beat P3."
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#the-trade-off-a-risk-leader-actually-manages",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#the-trade-off-a-risk-leader-actually-manages",
-    "title": "From a fraud score to a decision",
-    "section": "The trade-off a risk leader actually manages",
-    "text": "The trade-off a risk leader actually manages\nIn the end, every fraud policy balances two things: fraud let through and good customers inconvenienced. Plotting one against the other shows where each policy sits:\n\n\n\nFraud € let through vs legit customers reviewed or declined, per 1,000 transactions.\n\n\nP3 accepts a little more friction (about 0.75 good customers per 1,000 reviewed or declined) to cut fraud let through by about 38% compared with the 0.5 rule. Whether that’s the right balance is a business call. The point is that the chart makes the choice visible."
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#what-this-doesnt-tell-us",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#what-this-doesnt-tell-us",
-    "title": "From a fraud score to a decision",
-    "section": "What this doesn’t tell us",
-    "text": "What this doesn’t tell us\n\nFew frauds. 75 in the test window, so all the ranges are wide.\nThe costs are assumptions. Change them and the ranking can change.\nTwo days of anonymised data. No seasonality, and no card or customer IDs, so the same card could appear in both training and testing.\nInstant labels. Here we know right away which transactions were fraud. In real life, chargebacks take weeks to arrive."
-  },
-  {
-    "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#where-it-goes-next",
-    "href": "posts/2026-11-16-fraud-score-to-decision/index.html#where-it-goes-next",
-    "title": "From a fraud score to a decision",
-    "section": "Where it goes next",
-    "text": "Where it goes next\n\nApply the same decision layer to the larger IEEE-CIS fraud dataset, split by customer so no one appears in both training and testing.\nSimulate delayed labels to see how quickly a policy goes stale.\nEstimate how well analysts catch fraud at different risk levels, instead of assuming 90% everywhere.\n\nBack to the coffee and the laptop. A good fraud model gives them the same score, and that’s fine. Its job is to estimate risk. Deciding what to do with that risk is a separate job, and it’s where most of the money is.\nThe full write-up, with all formulas, the assumptions table and a one-page decision memo, is in the GitHub repo."
+    "section": "Limitations and next steps",
+    "text": "Limitations and next steps\nThe costs are assumptions, there are few frauds, and the data covers only two days with no customer IDs. Next, I’d move the same decision layer to the larger IEEE-CIS dataset, keep each customer in only one of training or testing, and simulate chargebacks arriving weeks later, as they do in practice.\nThe takeaway: a fraud model’s job is to estimate risk. Deciding what to do with that risk is a separate job, and it’s where most of the money is.\nFull details, formulas and a one-page decision memo are in the GitHub repo."
   },
   {
     "objectID": "about.html",
