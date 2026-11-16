@@ -183,20 +183,32 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p><strong>Code:</strong> <a href="https://github.com/Saminay786/transaction-risk-decision-framework">github.com/Saminay786/transaction-risk-decision-framework</a> · <strong>Status:</strong> in progress</p>
+<section id="two-transactions-same-score" class="level2">
+<h2 class="anchored" data-anchor-id="two-transactions-same-score">Two transactions, same score</h2>
+<p>Two card payments arrive at the same moment. One is a <strong>€3 coffee</strong>. The other is a <strong>€900 laptop</strong>. The fraud model gives both the same score: a <strong>10% chance of fraud</strong>.</p>
+<p>The most common rule in fraud tutorials is “decline if the score is above 0.5”. By that rule, both are approved, because 10% is well below 50%.</p>
+<p>But look at what’s at stake:</p>
 <ul>
-<li><strong>A fraud score isn’t a decision.</strong> The usual rule, “decline if the score is above 0.5”, treats a €2 and a €2,000 transaction the same.</li>
-<li><strong>Choosing the cheapest action per transaction works better.</strong> Approve, review or decline, whichever has the lowest expected € cost. On the test period it cut total cost per 1,000 transactions from <strong>€89.8 to €69.4</strong> and stopped <strong>68%</strong> of fraud € instead of 49%.</li>
-<li><strong>But the sample is small.</strong> With only 75 frauds in the test window, the saving against the 0.5 rule has a 95% interval of <strong>−€352 to €3,493</strong>. It points the right way but isn’t proven.</li>
-<li><strong>Tuning thresholds on a few frauds is fragile.</strong> A tuned two-threshold policy did <em>worse</em> than the plain 0.5 rule out of time.</li>
+<li>If the coffee is fraud, the bank loses about €3.</li>
+<li>If the laptop is fraud, the bank loses €900 plus chargeback fees.</li>
 </ul>
-<section id="where-this-comes-from" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-comes-from">Where this comes from</h2>
-<p>During my Master’s at IIT Madras I worked on <strong>Credit Default and Fraud Risk Prediction</strong> (American Express – IIT Madras, 2022). It was a classic modelling project: cleaning, KNN imputation, SMOTE-Tomek to balance the classes, stratified K-fold, and seven models compared on ROC-AUC and F1. XGBoost came out on top.</p>
-<p>That project answered <em>“how risky is this case?”</em> A risk team needs the next answer: <em>“what do we do about it, and what does it cost?”</em> This project is that next step.</p>
+<p>Having an analyst check the laptop costs around €5. That’s clearly worth it. Checking the coffee isn’t.</p>
+<p><strong>The same score can call for different decisions.</strong> A fraud model tells you <em>how risky</em> something is. It doesn’t tell you <em>what to do about it</em>. This project is about that second step.</p>
+<p>Here’s what I found:</p>
+<ul>
+<li><strong>Picking the cheapest action for each transaction beats a fixed cut-off.</strong> On the test period it cut total cost from <strong>€89.8 to €69.4 per 1,000 transactions</strong> and stopped <strong>68%</strong> of fraud € instead of 49%.</li>
+<li><strong>The data is thin, so I report how sure I am.</strong> With only 75 frauds in the test window, the saving against the 0.5 rule could be anywhere from <strong>−€352 to €3,493</strong> (95% interval). It points the right way, but it isn’t proven yet.</li>
+<li><strong>Fine-tuning a cut-off on a few frauds backfired.</strong> A carefully tuned two-threshold rule did slightly <em>worse</em> than the plain 0.5 rule on new data.</li>
+</ul>
 </section>
-<section id="the-problem" class="level2">
-<h2 class="anchored" data-anchor-id="the-problem">The problem</h2>
-<p>A card issuer sees a transaction and has three options:</p>
+<section id="where-this-started" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-started">Where this started</h2>
+<p>I first worked on fraud during my Master’s at IIT Madras, on <strong>Credit Default and Fraud Risk Prediction</strong> (American Express – IIT Madras, 2022). That was a classic modelling project. I cleaned the data, filled gaps with KNN imputation, balanced the classes with SMOTE-Tomek, and compared seven models with stratified K-fold cross-validation. XGBoost won on ROC-AUC and F1.</p>
+<p>Looking back, that project stopped at the question <em>“how risky is this case?”</em> A risk team has to go one step further: <em>“so what do we do, and what will it cost?”</em> This project picks up from there.</p>
+</section>
+<section id="three-choices-each-with-a-price" class="level2">
+<h2 class="anchored" data-anchor-id="three-choices-each-with-a-price">Three choices, each with a price</h2>
+<p>For every transaction, a card issuer can do one of three things. Each choice has a cost if it turns out wrong:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -213,34 +225,36 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><strong>Approve</strong></td>
-<td>lose the amount + chargeback costs</td>
-<td>nothing lost</td>
+<td>the bank loses the amount + chargeback fees</td>
+<td>no cost</td>
 </tr>
 <tr class="even">
-<td><strong>Review</strong> (analyst checks it)</td>
-<td>analyst cost; most fraud is caught</td>
-<td>analyst cost + a delayed customer</td>
+<td><strong>Review</strong> (an analyst checks it)</td>
+<td>analyst time; most fraud is caught</td>
+<td>analyst time + a delayed customer</td>
 </tr>
 <tr class="odd">
 <td><strong>Decline</strong></td>
 <td>fraud stopped</td>
-<td>lost margin + an annoyed customer</td>
+<td>lost sale + an annoyed customer</td>
 </tr>
 </tbody>
 </table>
-<p>Reviews are limited: there are only so many analysts. So the real question is which action is cheapest for <em>this</em> transaction, given its risk, its amount and the review budget.</p>
+<p>There’s one more real-world limit: <strong>analysts are limited.</strong> You can’t review everything, so reviews have to go where they matter most.</p>
+<p>That turns the problem into: <em>for this transaction, given its risk and its amount, which action is cheapest, and do we still have review capacity?</em></p>
 </section>
-<section id="approach" class="level2">
-<h2 class="anchored" data-anchor-id="approach">Approach</h2>
-<p><strong>Data:</strong> the public ULB credit-card dataset. It has 284,807 European card transactions over two days, 492 of them fraud (0.17%). The features are anonymised, which suits this project: the focus is the decision, not feature engineering.</p>
-<p><strong>1. Split by time, not at random.</strong> Train on the first 60% of the timeline, tune on the next 20%, test on the last 20%. That mimics deploying a model and seeing what happens next.</p>
-<p><strong>2. A plain model, calibrated.</strong> LightGBM, with <em>no</em> resampling this time. SMOTE helps F1, but it inflates predicted probabilities, and this project uses the probabilities as real numbers in a cost formula. I checked calibration (isotonic vs Platt scaling) on held-out data.</p>
-<p><strong>3. A cost for each action.</strong> With <em>p</em> = calibrated fraud probability and <em>A</em> = amount:</p>
-<pre><code>cost(approve) = p × (A + chargeback overhead)
-cost(review)  = analyst cost + p × (missed share) × (A + overhead) + (1 − p) × customer friction
-cost(decline) = (1 − p) × (lost margin on A + fixed false-decline cost)</code></pre>
-<p>The cost inputs (€5 per review, 90% of fraud caught on review, €15 chargeback overhead, 3% margin + €10 per false decline, €1 friction per legit review, reviews capped at 1% of transactions) are <strong>assumptions</strong> kept in one config file. In a real team, Finance and Ops would supply them.</p>
-<p><strong>4. Four policies, compared on the same test period.</strong></p>
+<section id="how-i-built-it" class="level2">
+<h2 class="anchored" data-anchor-id="how-i-built-it">How I built it</h2>
+<p><strong>The data.</strong> I used the public ULB credit-card dataset: 284,807 European card transactions over two days, of which 492 (0.17%) are fraud. The features are anonymised, which suits this project. The interesting part here is the decision, not the features.</p>
+<p><strong>Step 1: split by time, like real life.</strong> In practice you train a model on the past and use it on the future. So I trained on the first 60% of the timeline, tuned on the next 20%, and kept the last 20% as an untouched test period. Random splits would quietly let the model “see the future”.</p>
+<p><strong>Step 2: a plain model, but with trustworthy probabilities.</strong> I used LightGBM, a standard choice. The important change from my 2022 project: <strong>no SMOTE this time.</strong> Resampling helps F1, but it makes the model think fraud is far more common than it is, so a “10%” score no longer means 10%. Here the probability goes straight into a € calculation, so it has to be honest. I checked this with calibration (Platt scaling vs isotonic regression) on held-out data.</p>
+<p><strong>Step 3: put a price on each action.</strong> With <em>p</em> = fraud probability and <em>A</em> = transaction amount:</p>
+<pre><code>cost(approve) = p × (A + chargeback fees)
+cost(review)  = analyst cost + p × (share analysts miss) × (A + fees) + (1 − p) × customer delay
+cost(decline) = (1 − p) × (lost margin on A + cost of an annoyed customer)</code></pre>
+<p>For the laptop at 10%, that gives about <strong>€92 to approve, €15 to review, €33 to decline</strong>, so it goes to review. For the coffee: <strong>€1.80 to approve</strong>, more for anything else, so it goes through.</p>
+<p>The costs behind these formulas are assumptions I set in one config file: €5 per review, analysts catch 90% of fraud, €15 chargeback fees, 3% lost margin + €10 per wrongly declined customer, €1 delay cost per reviewed legit customer, and reviews capped at 1% of transactions. In a real bank, Finance and Operations would supply these numbers.</p>
+<p><strong>Step 4: compare four ways of deciding</strong> on the same test period:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -249,43 +263,39 @@ cost(decline) = (1 − p) × (lost margin on A + fixed false-decline cost)</code
 <thead>
 <tr class="header">
 <th>Policy</th>
-<th>Rule</th>
+<th>How it decides</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>P0</td>
-<td>approve everything (baseline)</td>
+<td><strong>P0</strong></td>
+<td>approve everything (to see what doing nothing costs)</td>
 </tr>
 <tr class="even">
-<td>P1</td>
+<td><strong>P1</strong></td>
 <td>decline if p &gt; 0.5 (the common default)</td>
 </tr>
 <tr class="odd">
-<td>P2</td>
-<td>two thresholds, review band + decline band, tuned on validation</td>
+<td><strong>P2</strong></td>
+<td>two cut-offs, one for review and one for decline, tuned on past data</td>
 </tr>
 <tr class="even">
-<td>P3</td>
-<td>per transaction, pick the action with the lowest expected cost; respect the review cap</td>
+<td><strong>P3</strong></td>
+<td>for each transaction, pick the cheapest action; respect the review cap</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="results" class="level2">
-<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="what-happened" class="level2">
+<h2 class="anchored" data-anchor-id="what-happened">What happened</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="cost_by_policy.png" class="img-fluid figure-img" alt="Horizontal bar chart of cost per 1,000 transactions: approve-all €155, P1 €90, P2 €91, P3 €69, with wide overlapping error bars."></p>
-<figcaption>Total cost per 1,000 test transactions, with 95% bootstrap intervals.</figcaption>
+<figcaption>Total cost per 1,000 test transactions. The black lines show the 95% range from resampling.</figcaption>
 </figure>
 </div>
+<p>Doing nothing (P0) costs €155 per 1,000 transactions. The standard 0.5 rule (P1) cuts that to €90. Choosing per transaction (P3) brings it down to <strong>€69</strong>.</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 27%">
-<col style="width: 36%">
-<col style="width: 36%">
-</colgroup>
 <thead>
 <tr class="header">
 <th></th>
@@ -310,58 +320,70 @@ cost(decline) = (1 − p) × (lost margin on A + fixed false-decline cost)</code
 <td style="text-align: right;"><strong>€2,455</strong></td>
 </tr>
 <tr class="even">
-<td>Manual reviews used</td>
+<td>Analyst reviews used</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">33 (cap: 569)</td>
-</tr>
-<tr class="odd">
-<td>Saving vs approve-all [95% CI]</td>
-<td style="text-align: right;">€3,737 [€538, €7,769]</td>
-<td style="text-align: right;"><strong>€4,899</strong> [€1,307, €9,362]</td>
+<td style="text-align: right;">33 (out of 569 allowed)</td>
 </tr>
 </tbody>
 </table>
-<p><strong>What’s going on:</strong> P3 uses the amount. A medium-risk €900 transaction is worth an analyst’s €5. A medium-risk €3 transaction isn’t. A single probability cut-off can’t make that distinction.</p>
-<p><strong>How sure are we?</strong> I resampled the test set 1,000 times. P3 beats approve-all in 99.7% of resamples. It beats the 0.5 rule in 85% of them, so the interval for that saving still includes zero. With 75 frauds, one large fraud can swing a total. <strong>I’d treat this as a strong case for a shadow pilot, not a booked saving.</strong></p>
-<p><strong>The tuned policy didn’t hold up.</strong> P2’s thresholds were tuned on just 33 validation frauds and settled on “decline above 0.56, no reviews”, slightly worse than P1 on test. P3 has no thresholds to tune on fraud labels; it only needs a calibrated score. When labels are scarce, that’s a real advantage.</p>
-<section id="how-sensitive-is-this-to-review-cost" class="level3">
-<h3 class="anchored" data-anchor-id="how-sensitive-is-this-to-review-cost">How sensitive is this to review cost?</h3>
+<p>Where does the gain come from? Exactly the coffee-and-laptop situation. P3 spends a few analyst reviews on risky, <em>expensive</em> transactions that the 0.5 rule would have waved through. It needed only 33 reviews to do it, far below the cap.</p>
+</section>
+<section id="can-we-trust-the-gain" class="level2">
+<h2 class="anchored" data-anchor-id="can-we-trust-the-gain">Can we trust the gain?</h2>
+<p>Here the honest answer is “partly”. The test window has only <strong>75 frauds</strong>, and a single big fraud can move the totals a lot.</p>
+<p>To measure that uncertainty, I resampled the test period 1,000 times and recalculated each time:</p>
+<ul>
+<li>P3 is cheaper than approving everything in <strong>99.7%</strong> of resamples. That part is solid.</li>
+<li>P3 is cheaper than the 0.5 rule in <strong>85%</strong> of resamples. That’s encouraging, but the 95% range for the saving still includes zero.</li>
+</ul>
+<p>So I wouldn’t present this as “P3 saves €1,162”. I’d present it as <strong>a strong case for a shadow pilot</strong>: run P3 alongside the current rule, without acting on it, and measure.</p>
+</section>
+<section id="a-surprise-tuning-made-things-worse" class="level2">
+<h2 class="anchored" data-anchor-id="a-surprise-tuning-made-things-worse">A surprise: tuning made things worse</h2>
+<p>P2 is what many teams would try first: keep simple cut-offs, but tune them on past data. I tuned them on the validation period, which had only <strong>33 frauds</strong>. The best setting it found was “decline above 0.56, never review”. On the test period, that did slightly worse than the plain 0.5 rule.</p>
+<p>With so few frauds, tuning mostly fits noise. P3 sidesteps this because <strong>it has no cut-offs to tune.</strong> It only needs honest probabilities and the cost assumptions. When fraud labels are scarce, which they usually are, that’s a real advantage.</p>
+</section>
+<section id="what-if-analysts-cost-more" class="level2">
+<h2 class="anchored" data-anchor-id="what-if-analysts-cost-more">What if analysts cost more?</h2>
+<p>The €5 review cost is a guess, so I re-ran everything with review costs from €1 to €20:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="sensitivity_cr.png" class="img-fluid figure-img" alt="Three panels. P2 thresholds are flat except at €1 review cost. P3 cost per 1,000 stays between €67 and €70 while P1 is €90. P3 reviews fall from 133 at €1 to 4 at €20."></p>
-<figcaption>P2’s tuned thresholds, test cost and reviews used as the cost of one review goes from €1 to €20.</figcaption>
+<figcaption>How each policy responds as the cost of one review goes from €1 to €20.</figcaption>
 </figure>
 </div>
-<p>As reviews get more expensive, P3 simply uses fewer of them (133 at €1 down to 4 at €20), and its cost stays between €67 and €70 per 1,000. One honest exception: at €1 per review, the tuned P2 does beat P3.</p>
+<p>P3 adapts on its own. Cheap reviews: it uses more of them (133 at €1). Expensive reviews: it saves them for the riskiest cases (just 4 at €20). Its total cost stays between €67 and €70 throughout, against €90 for the 0.5 rule.</p>
+<p>One exception I want to be upfront about: at €1 per review, the tuned P2 does beat P3.</p>
 </section>
-<section id="the-trade-off-a-risk-leader-actually-manages" class="level3">
-<h3 class="anchored" data-anchor-id="the-trade-off-a-risk-leader-actually-manages">The trade-off a risk leader actually manages</h3>
+<section id="the-trade-off-a-risk-leader-actually-manages" class="level2">
+<h2 class="anchored" data-anchor-id="the-trade-off-a-risk-leader-actually-manages">The trade-off a risk leader actually manages</h2>
+<p>In the end, every fraud policy balances two things: <strong>fraud let through</strong> and <strong>good customers inconvenienced</strong>. Plotting one against the other shows where each policy sits:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="frontier.png" class="img-fluid figure-img" alt="Frontier chart: residual fraud exposure falls as more legit customers are reviewed or declined. P1 and P2 sit at low friction and higher losses; P3 sits lower with slightly more friction."></p>
-<figcaption>Residual fraud exposure vs number of legit customers affected, per 1,000 transactions.</figcaption>
+<figcaption>Fraud € let through vs legit customers reviewed or declined, per 1,000 transactions.</figcaption>
 </figure>
 </div>
-<p>Every policy is a point on a loss-vs-friction curve: fraud € let through against good customers inconvenienced. P3 accepts slightly more friction (about 0.75 legit customers per 1,000 reviewed or declined) to cut residual fraud by about 38% against P1.</p>
+<p>P3 accepts a little more friction (about 0.75 good customers per 1,000 reviewed or declined) to cut fraud let through by about 38% compared with the 0.5 rule. Whether that’s the right balance is a business call. The point is that the chart makes the choice visible.</p>
 </section>
-</section>
-<section id="limitations" class="level2">
-<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<section id="what-this-doesnt-tell-us" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-doesnt-tell-us">What this doesn’t tell us</h2>
 <ul>
-<li><strong>Few frauds.</strong> 75 in the test window, so intervals are wide.</li>
-<li><strong>Costs are assumptions.</strong> The ranking of policies depends on them.</li>
-<li><strong>Two days of anonymised data.</strong> No seasonality, no card or user IDs, so no control for the same card appearing in train and test.</li>
-<li><strong>Labels arrive instantly here.</strong> In real life, chargebacks take weeks.</li>
+<li><strong>Few frauds.</strong> 75 in the test window, so all the ranges are wide.</li>
+<li><strong>The costs are assumptions.</strong> Change them and the ranking can change.</li>
+<li><strong>Two days of anonymised data.</strong> No seasonality, and no card or customer IDs, so the same card could appear in both training and testing.</li>
+<li><strong>Instant labels.</strong> Here we know right away which transactions were fraud. In real life, chargebacks take weeks to arrive.</li>
 </ul>
 </section>
-<section id="whats-next" class="level2">
-<h2 class="anchored" data-anchor-id="whats-next">What’s next</h2>
+<section id="where-it-goes-next" class="level2">
+<h2 class="anchored" data-anchor-id="where-it-goes-next">Where it goes next</h2>
 <ul>
-<li>Move the same decision layer to the larger <strong>IEEE-CIS</strong> fraud dataset, with user-level splits to control leakage.</li>
-<li>Simulate <strong>label delay</strong> and see how quickly a policy goes stale.</li>
-<li>Estimate the review catch rate by risk band instead of assuming 90% everywhere.</li>
+<li>Apply the same decision layer to the larger <strong>IEEE-CIS</strong> fraud dataset, split by customer so no one appears in both training and testing.</li>
+<li>Simulate <strong>delayed labels</strong> to see how quickly a policy goes stale.</li>
+<li>Estimate how well analysts catch fraud at different risk levels, instead of assuming 90% everywhere.</li>
 </ul>
-<p>The full write-up, including the formulas, assumptions table and a one-page decision memo, is in the <a href="https://github.com/Saminay786/transaction-risk-decision-framework">GitHub repo</a>.</p>
+<p>Back to the coffee and the laptop. A good fraud model gives them the same score, and that’s fine. Its job is to estimate risk. <strong>Deciding what to do with that risk is a separate job</strong>, and it’s where most of the money is.</p>
+<p>The full write-up, with all formulas, the assumptions table and a one-page decision memo, is in the <a href="https://github.com/Saminay786/transaction-risk-decision-framework">GitHub repo</a>.</p>
 
 
 </section>
