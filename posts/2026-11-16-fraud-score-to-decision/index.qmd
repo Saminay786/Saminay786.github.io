@@ -78,6 +78,18 @@ P3 wins by doing exactly what the laptop example suggests: it spends a few revie
 
 **If analysts cost more?** Raising the review cost from €1 to €20, P3 uses fewer reviews (133 down to 4), and its cost stays around €67–70 per 1,000, against €90 for the 0.5 rule.
 
+## Is this new?
+
+No, not as an idea. Making decisions by expected cost is well established, and this project applies it rather than inventing it:
+
+- **Cost-based thresholds:** Elkan, *The Foundations of Cost-Sensitive Learning* (IJCAI 2001).
+- **Cost-based fraud decisions, per transaction:** Correa Bahnsen et al., *Cost Sensitive Credit Card Fraud Detection Using Bayes Minimum Risk* (ICMLA 2013), and their later work on example-dependent costs.
+- **A "review" option beside yes/no:** the reject option, going back to Chow (1970).
+- **Resampling distorts probabilities:** Dal Pozzolo et al., *Calibrating Probability with Undersampling for Unbalanced Classification* (2015). This is from the same ULB group that released the dataset.
+- **Limited analyst capacity in fraud:** Dal Pozzolo et al., *Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy* (IEEE TNNLS 2018).
+
+What this project adds is small and practical: it puts these pieces into one end-to-end pipeline, with three actions, amount-based costs, a review cap and a test on a later time period. It also reports how uncertain the gain is, which most public work on this dataset skips, and shows that tuned cut-offs can fail when fraud examples are few.
+
 ## Limitations and next steps
 
 The costs are assumptions, there are few frauds, and the data covers only two days with no customer IDs. Next, I'd move the same decision layer to the larger **IEEE-CIS** dataset, keep each customer in only one of training or testing, and simulate chargebacks arriving weeks later, as they do in practice.
