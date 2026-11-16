@@ -103,10 +103,6 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../projects.html"> 
-<span class="menu-text">Projects</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -297,8 +293,8 @@ decline = (1 − p) × (lost margin + cost of an annoyed customer)</code></pre>
 <ul>
 <li><strong>Cost-based thresholds:</strong> Elkan, <em>The Foundations of Cost-Sensitive Learning</em> (IJCAI 2001).</li>
 <li><strong>Cost-based fraud decisions, per transaction:</strong> Correa Bahnsen et al., <em>Cost Sensitive Credit Card Fraud Detection Using Bayes Minimum Risk</em> (ICMLA 2013), and their later work on example-dependent costs.</li>
-<li><strong>A “review” option beside yes/no:</strong> the reject option, going back to Chow (1970).</li>
-<li><strong>Resampling distorts probabilities:</strong> Dal Pozzolo et al., <em>Calibrating Probability with Undersampling for Unbalanced Classification</em> (2015). This is from the same ULB group that released the dataset.</li>
+<li><strong>A “review” option beside yes/no:</strong> the reject option, formalised by Chow (1957, 1970).</li>
+<li><strong>Resampling distorts probabilities:</strong> Dal Pozzolo et al., <em>Calibrating Probability with Undersampling for Unbalanced Classification</em> (IEEE SSCI 2015). This is from the same ULB group that released the dataset.</li>
 <li><strong>Limited analyst capacity in fraud:</strong> Dal Pozzolo et al., <em>Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy</em> (IEEE TNNLS 2018).</li>
 </ul>
 <p>What this project adds is small and practical: it puts these pieces into one end-to-end pipeline, with three actions, amount-based costs, a review cap and a test on a later time period. It also reports how uncertain the gain is, which most public work on this dataset skips, and shows that tuned cut-offs can fail when fraud examples are few.</p>

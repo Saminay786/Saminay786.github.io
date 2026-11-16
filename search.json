@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "projects.html",
-    "href": "projects.html",
-    "title": "Projects",
-    "section": "",
-    "text": "Promo Optimization Engine\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\nWhich promotions actually create extra sales, how should a retailer schedule them, and how would you prove it works? Double ML, promo calendar optimisation, a Bayesian MMM…\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html",
     "title": "Same Fraud Score, Different Decision",
@@ -53,7 +46,7 @@
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html#is-this-new",
     "title": "Same Fraud Score, Different Decision",
     "section": "Is this new?",
-    "text": "Is this new?\nNo, not as an idea. Making decisions by expected cost is well established, and this project applies it rather than inventing it:\n\nCost-based thresholds: Elkan, The Foundations of Cost-Sensitive Learning (IJCAI 2001).\nCost-based fraud decisions, per transaction: Correa Bahnsen et al., Cost Sensitive Credit Card Fraud Detection Using Bayes Minimum Risk (ICMLA 2013), and their later work on example-dependent costs.\nA “review” option beside yes/no: the reject option, going back to Chow (1970).\nResampling distorts probabilities: Dal Pozzolo et al., Calibrating Probability with Undersampling for Unbalanced Classification (2015). This is from the same ULB group that released the dataset.\nLimited analyst capacity in fraud: Dal Pozzolo et al., Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy (IEEE TNNLS 2018).\n\nWhat this project adds is small and practical: it puts these pieces into one end-to-end pipeline, with three actions, amount-based costs, a review cap and a test on a later time period. It also reports how uncertain the gain is, which most public work on this dataset skips, and shows that tuned cut-offs can fail when fraud examples are few."
+    "text": "Is this new?\nNo, not as an idea. Making decisions by expected cost is well established, and this project applies it rather than inventing it:\n\nCost-based thresholds: Elkan, The Foundations of Cost-Sensitive Learning (IJCAI 2001).\nCost-based fraud decisions, per transaction: Correa Bahnsen et al., Cost Sensitive Credit Card Fraud Detection Using Bayes Minimum Risk (ICMLA 2013), and their later work on example-dependent costs.\nA “review” option beside yes/no: the reject option, formalised by Chow (1957, 1970).\nResampling distorts probabilities: Dal Pozzolo et al., Calibrating Probability with Undersampling for Unbalanced Classification (IEEE SSCI 2015). This is from the same ULB group that released the dataset.\nLimited analyst capacity in fraud: Dal Pozzolo et al., Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy (IEEE TNNLS 2018).\n\nWhat this project adds is small and practical: it puts these pieces into one end-to-end pipeline, with three actions, amount-based costs, a review cap and a test on a later time period. It also reports how uncertain the gain is, which most public work on this dataset skips, and shows that tuned cut-offs can fail when fraud examples are few."
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html#limitations-and-next-steps",
@@ -61,6 +54,13 @@
     "title": "Same Fraud Score, Different Decision",
     "section": "Limitations and next steps",
     "text": "Limitations and next steps\nThe costs are assumptions, there are few frauds, and the data covers only two days with no customer IDs. Next, I’d move the same decision layer to the larger IEEE-CIS dataset, keep each customer in only one of training or testing, and simulate chargebacks arriving weeks later, as they do in practice.\nThe takeaway: a fraud model’s job is to estimate risk. Deciding what to do with that risk is a separate job, and it’s where most of the money is.\nFull details, formulas and a one-page decision memo are in the GitHub repo."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Same Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nAlmost Half of Promo Sales Would Have Happened Anyway\n\n\nMeasuring what grocery discounts really cause, and planning promotions around it\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\n\nA discount that doubles sales can still lose money. Using two years of real grocery data, I measured what discounts actually cause, built a promo calendar around it, checked it with a second model, and asked whether a store test could even prove it works.\n\n\n\n\n\n\nNov 8, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -84,66 +84,59 @@
     "text": "Experience\nAccenture Strategy & Consulting | Decision Science Analyst | 2025 – present\nBuilding pricing, forecasting and demand-sourcing models for industrial clients.\nAmerican Express, Data Analytics & Risk Tech. Lab (via IIT Madras) | Research Associate | 2023 – 2025"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Same Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "projects/promo-optimization-engine/index.html",
-    "href": "projects/promo-optimization-engine/index.html",
-    "title": "Promo Optimization Engine",
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
     "section": "",
     "text": "Code: github.com/Saminay786/promo-optimization-engine"
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#the-problem",
-    "href": "projects/promo-optimization-engine/index.html#the-problem",
-    "title": "Promo Optimization Engine",
-    "section": "The problem",
-    "text": "The problem\nRetailers spend a lot on promotions. The common way to judge them is “units sold during the promo vs. a normal week”. That number mixes up three things: the discount itself, the display or mailer that usually comes with it, and sales that would have happened anyway. Plan from it, and you over-invest in discounts.\nThe project works through four questions in order:\n\n\n\n\n\n\n\n\nStep\nQuestion\nMethod\n\n\n\n\n1. Measure\nHow much extra volume does a discount actually cause?\nDouble Machine Learning\n\n\n2. Decide\nWhich product should get which discount, in which week?\nInteger optimisation (CP-SAT)\n\n\n3. Cross-check\nDoes a top-down view agree?\nBayesian marketing mix model\n\n\n4. Test\nHow would we prove it works in real stores?\nA/B test design: power simulation + CUPED\n\n\n\nData: dunnhumby’s The Complete Journey, with two years of grocery transactions from ~2,500 households plus display and mailer data. I used the 137 top-revenue products over 99 weeks (11,892 product-weeks), excluding fuel, gift cards and miscellaneous items."
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#the-20-off-puzzle",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#the-20-off-puzzle",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "The 20%-off puzzle",
+    "text": "The 20%-off puzzle\nA box of cereal goes 20% off and sales double, from 100 boxes to 200. Success?\nMaybe not. That same week, the cereal was probably also on the front of the weekly flyer and on a display at the end of the aisle. Some of those 200 boxes would have sold anyway, just at a lower price. And some shoppers simply switched from the cereal next to it.\n“Sales went up during the promo” mixes all of that together. Plan from it, and you keep paying for discounts that don’t earn their cost.\nI used dunnhumby’s The Complete Journey, two years of real grocery shopping from about 2,500 households, to pull these apart in four steps:\n\n\n\n\n\n\n\n\nStep\nQuestion\nMethod\n\n\n\n\n1. Measure\nHow much extra does a discount actually cause?\nDouble Machine Learning\n\n\n2. Plan\nWhich product gets which discount, in which week?\nInteger optimisation\n\n\n3. Cross-check\nDoes the whole-category view agree?\nBayesian marketing mix model\n\n\n4. Test\nCould a store test prove it works?\nA/B test simulation"
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#measure-what-does-a-discount-really-cause",
-    "href": "projects/promo-optimization-engine/index.html#measure-what-does-a-discount-really-cause",
-    "title": "Promo Optimization Engine",
-    "section": "1. Measure: what does a discount really cause?",
-    "text": "1. Measure: what does a discount really cause?\nI built a product × week panel. The treatment is discount depth. The controls are display/mailer exposure, past sales, seasonality and how much else in the category was on promo. I then estimated the effect with Double ML (EconML LinearDML, LightGBM, 5-fold cross-fitting) and compared it with a naive estimate and a placebo test.\n\n\n\n\nElasticity θ\nWhat 10% off does\n\n\n\n\nNaive (no controls)\n3.49\n+42% units\n\n\nDouble ML\n2.51 (95% CI 2.18–2.85)\n+29% units\n\n\nPlacebo test\n0.01\nno effect, as expected\n\n\n\nAbout 43.8% of promo volume was non-incremental. Those were sales the retailer would have made anyway."
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-1-what-does-a-discount-really-cause",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-1-what-does-a-discount-really-cause",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Step 1: What does a discount really cause?",
+    "text": "Step 1: What does a discount really cause?\nI built a weekly history for the 137 top-selling products over 99 weeks. Then I asked: in weeks when the discount was deeper than usual, beyond what the flyer, display, season and recent sales would explain, did sales rise more than expected? That’s the idea behind Double ML: strip out everything else first, so the discount only gets credit for what’s left.\n\n\n\n\n\n\n\n\n\nEffect (θ)\nWhat 10% off does\n\n\n\n\nNaive: promo weeks vs. normal weeks\n3.49\n+42% units\n\n\nDouble ML: other factors removed\n2.51 (95% CI 2.18–2.85)\n+29% units\n\n\nPlacebo: discounts randomly shuffled\n0.01\nnothing, as it should\n\n\n\nThe naive view overstates the discount by about 40%, because it gives the discount credit for the flyer and display’s work. And 44% of promo-week sales would have happened anyway."
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#decide-build-the-promo-calendar",
-    "href": "projects/promo-optimization-engine/index.html#decide-build-the-promo-calendar",
-    "title": "Promo Optimization Engine",
-    "section": "2. Decide: build the promo calendar",
-    "text": "2. Decide: build the promo calendar\nThe per-category effects feed an integer program (OR-Tools CP-SAT). It picks a discount (10/20/30% or none) for each product-week, subject to a budget, weekly promo slots, a frequency cap, a per-category cap and no back-to-back promos. I compared it with a common rule of thumb: deepest discount on the top sellers.\nSame $5k budget, 8 weeks, 10 promo slots per week:\n\n\n\n\nIncremental margin\nBudget used\n\n\n\n\n“Deepest discount on top sellers”\n$60\nfull\n\n\nOptimised calendar\n$719\n37% less\n\n\n\nThe rule of thumb loses mostly because it puts deep discounts on products that would sell anyway. Treat the absolute dollar figure with caution: step 3 suggests it’s overstated."
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-2-plan-the-promo-calendar",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-2-plan-the-promo-calendar",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Step 2: Plan the promo calendar",
+    "text": "Step 2: Plan the promo calendar\nFor 8 weeks with 10 promo slots a week, which product should get 10%, 20% or 30% off, and when? The rules interact (a budget, a cap per category so cereals don’t steal from each other, no back-to-back weeks so shoppers don’t just stock up), so I set it up as an integer program and let a solver (OR-Tools CP-SAT) find the best combination.\nThe comparison is a common rule of thumb: deepest discount on the best sellers. Same rules, same $5k budget:\n\n\n\n\nExtra margin\nBudget used\n\n\n\n\n“Deepest discount on top sellers”\n$60\nall of it\n\n\nOptimised calendar\n$719\n37% less\n\n\n\nThe rule of thumb loses because 30% off only pays for itself on about 1 in 4 products. On the rest, the discount given on sales that would have happened anyway outweighs the extra sales. The solver saves deep discounts for products that respond strongly, like beer and soft drinks."
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#cross-check-the-category-view",
-    "href": "projects/promo-optimization-engine/index.html#cross-check-the-category-view",
-    "title": "Promo Optimization Engine",
-    "section": "3. Cross-check: the category view",
-    "text": "3. Cross-check: the category view\nAs a top-down check, I modelled weekly category sales for 8 categories with a Bayesian marketing mix model (PyMC-Marketing). It has three levers (discount rate, mailers, displays) and accounts for carryover and diminishing returns.\n\n\n\nMargin returned per dollar of retailer discount, by category (Bayesian MMM, 94% credible intervals).\n\n\n\nDiscount ROI is below 1 in 7 of 8 categories. Soft drinks return about $0.69 per $1 of discount. Only frozen pizza is above break-even (1.24), and even there the interval is wide.\nDisplays look cheap to break even on (roughly $0.005–0.08 per placement). That hints at moving some discount money into displays, depending on costs I don’t have.\nBoth models rank the categories the same way. But the category-level effect is only 43–55% of the product-level one for bread, cheese and soft drinks (19% for deli meats). That fits with discounts partly stealing sales from other products in the same category (cannibalisation). So the optimiser’s gain is probably about half what step 2 says.\nModel health: 0 divergences, max r-hat 1.008, R² 0.44–0.64 for 7 of 8 categories."
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-3-zoom-out-to-the-whole-category",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-3-zoom-out-to-the-whole-category",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Step 3: Zoom out to the whole category",
+    "text": "Step 3: Zoom out to the whole category\nStep 1 looked at products one at a time. As a check, I modelled weekly sales for 8 whole categories with a Bayesian marketing mix model (PyMC-Marketing). It has three levers (discount, flyer and display), and it allows for effects that linger a week or two and for diminishing returns.\n\n\n\nMargin returned per $1 of retailer discount, by category (94% credible intervals).\n\n\n\nMost discounts don’t pay for themselves. In 7 of 8 categories, each $1 of discount brings back less than $1 of margin. Soft drinks return about $0.69. Only frozen pizza clears break-even.\nThe twist: both models rank the categories the same way, but the category-level effect is only about half the product-level one. That’s what cannibalisation looks like: when one cereal is discounted, part of its jump is taken from the cereal next to it. The category total rises by less than the product does.\nSo Step 2’s $719 is probably about twice too high. The comparison still holds, since both plans use the same estimates, but the dollar figure is optimistic."
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#test-how-would-we-prove-it-works",
-    "href": "projects/promo-optimization-engine/index.html#test-how-would-we-prove-it-works",
-    "title": "Promo Optimization Engine",
-    "section": "4. Test: how would we prove it works?",
-    "text": "4. Test: how would we prove it works?\nA model’s prediction isn’t proof. Before rolling out the calendar, a retailer would want to test it, so I designed the experiment:\n\nDesign: randomly split stores 50/50. Treatment stores run the optimised calendar, and control stores keep current practice.\nUnit: stores, not shoppers, because a promo calendar applies to everyone who shops in a store. The data has 582 stores. The 137 planned products sell in 115 of them, and 84 have enough weekly sales to include.\nMetric: weekly promo margin per store on the planned products.\nAnalysis: compare the groups with a t-test, using CUPED to adjust for each store’s margin in the 8 weeks before the test. Big stores stay big, so removing that predictable part cuts the noise.\n\nThen I checked the design on real history: 84 stores, with 1,000 simulated tests per scenario.\nIs the analysis trustworthy? I ran “A/A tests”: random splits with no real change. The test raised a false alarm 4–6% of the time, which matches the 5% it should.\nHow big an effect could it detect? I added known lifts to the treatment stores and counted how often the test caught them:\n\n\n\nChance an 8-week test detects a given true lift, with and without CUPED (1,000 simulations each, real store data).\n\n\n\n\n\n\n\n\n\n\nAnswer\n\n\n\n\nSmallest lift detectable 80% of the time (8 weeks, CUPED)\n≈13% (12% at 12 weeks, 15% at 4 weeks)\n\n\nWithout CUPED\nnever reaches 80%, even at a 15% lift\n\n\nOptimiser’s predicted gain vs. current practice\n≈3% (≈1.6% if step 3 is right)\n\n\nChance of detecting 3% with this test\n≈10%\n\n\nStores needed to detect 3%\n≈1,500\n\n\n\nWhat this means:\n\nWith these stores, a test would almost always say “no significant effect”, even if the calendar works. That result shouldn’t be read as the calendar failing.\nCUPED matters a lot here. It roughly triples the chance of detecting a real effect.\nThe real fix is a bigger or less noisy test: full-store sales instead of a 2,500-household panel (here each store sees only ~100 panel households, while a real store likely serves far more), a metric that pools more categories, a longer test, or a switchback design.\n\nIt’s much better to learn this before running a test than after."
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-4-could-a-store-test-even-prove-it",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#step-4-could-a-store-test-even-prove-it",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Step 4: Could a store test even prove it?",
+    "text": "Step 4: Could a store test even prove it?\nA prediction isn’t proof. So I designed the test a retailer would run: split stores 50/50, run the new calendar in half, and compare weekly promo margin, using CUPED (adjusting for how each store did before the test) to cut the noise. Then I simulated it 1,000 times on real store history:\n\n\n\nChance that an 8-week test detects a given true lift, with and without CUPED.\n\n\n\nThe test is fair: with no real change, it raised a false alarm about 5% of the time, exactly as designed.\nBut it’s too small. With 84 usable stores, it reliably detects only lifts of about 13% or more. The calendar is expected to add about 3%, and this test would catch that only about 10% of the time.\nCUPED roughly triples the chance of catching a real effect.\n\nSo a “not significant” result wouldn’t mean the calendar failed, only that the test couldn’t see it. Proving a 3% lift would need about 1,500 stores, a longer test or a less noisy metric. Much better to know that before running it."
   },
   {
-    "objectID": "projects/promo-optimization-engine/index.html#limitations",
-    "href": "projects/promo-optimization-engine/index.html#limitations",
-    "title": "Promo Optimization Engine",
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#what-id-tell-a-promo-team",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#what-id-tell-a-promo-team",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "What I’d tell a promo team",
+    "text": "What I’d tell a promo team\n\nJudge a promo by the sales it creates, not the sales it records. Almost half of promo volume was going to happen anyway.\nDeeper isn’t better. Most categories lost money on deeper discounts. Save them for the few products that really respond.\nCheck product-level wins at category level. Part of every “uplift” is stolen from the shelf next to it.\nSize the test before you run it. Otherwise a “no effect” result can kill a good idea."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#limitations",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#limitations",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
     "section": "Limitations",
-    "text": "Limitations\n\nObservational data. The Double ML estimate is causal only if the controls capture everything that drives both promo decisions and sales.\nNo cost data. Margin is assumed to be 30% of shelf price, and suppliers are assumed to fund 50% of the discount. Display and mailer costs are unknown.\nThe optimiser likely over-credits discounts. Cannibalisation is handled only by a simple category cap, and pull-forward (shoppers stocking up) only by a “no back-to-back promos” rule.\nThe test simulation is simplified. It applies the lift evenly to the store metric, and panel stores only see panel households’ purchases. The method transfers to a real retailer, but the store count doesn’t.\nThe MMM has 82 weeks per category, and mailers and displays often run together, so their separate effects are uncertain."
-  },
-  {
-    "objectID": "projects/promo-optimization-engine/index.html#whats-next",
-    "href": "projects/promo-optimization-engine/index.html#whats-next",
-    "title": "Promo Optimization Engine",
-    "section": "What’s next",
-    "text": "What’s next\n\nScale the product-level effects by a category-level factor, so the optimiser stops over-crediting discounts.\nModel pull-forward directly instead of using a rule.\nExtend the test design with a switchback (alternating weeks) and stratified store assignment, and compare their power."
+    "text": "Limitations\nThe data is observational, so the Double ML result holds only if I’ve measured what drives both promo decisions and sales. There’s no cost data: margin (30% of price), supplier funding (50% of the discount) and display costs are assumptions. Cannibalisation and stock-piling are handled with simple rules. And with only a 2,500-household panel, a real retailer’s full store sales would make the test far more powerful.\nNext: scale product-level effects to category level before optimising, model stock-piling directly, and compare other test designs, such as alternating weeks.\nFull code, results and every number above are in the GitHub repo."
   }
 ]
