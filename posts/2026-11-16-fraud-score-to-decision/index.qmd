@@ -84,8 +84,8 @@ No, not as an idea. Making decisions by expected cost is well established, and t
 
 - **Cost-based thresholds:** Elkan, *The Foundations of Cost-Sensitive Learning* (IJCAI 2001).
 - **Cost-based fraud decisions, per transaction:** Correa Bahnsen et al., *Cost Sensitive Credit Card Fraud Detection Using Bayes Minimum Risk* (ICMLA 2013), and their later work on example-dependent costs.
-- **A "review" option beside yes/no:** the reject option, going back to Chow (1970).
-- **Resampling distorts probabilities:** Dal Pozzolo et al., *Calibrating Probability with Undersampling for Unbalanced Classification* (2015). This is from the same ULB group that released the dataset.
+- **A "review" option beside yes/no:** the reject option, formalised by Chow (1957, 1970).
+- **Resampling distorts probabilities:** Dal Pozzolo et al., *Calibrating Probability with Undersampling for Unbalanced Classification* (IEEE SSCI 2015). This is from the same ULB group that released the dataset.
 - **Limited analyst capacity in fraud:** Dal Pozzolo et al., *Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy* (IEEE TNNLS 2018).
 
 What this project adds is small and practical: it puts these pieces into one end-to-end pipeline, with three actions, amount-based costs, a review cap and a test on a later time period. It also reports how uncertain the gain is, which most public work on this dataset skips, and shows that tuned cut-offs can fail when fraud examples are few.
