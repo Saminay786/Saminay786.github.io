@@ -1,5 +1,138 @@
 [
   {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html",
+    "title": "Have These Reviews Changed?",
+    "section": "",
+    "text": "Code: github.com/Saminay786/real-deal · Status: working prototype (Chrome, amazon.in)"
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-this-project-is-about",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-this-project-is-about",
+    "title": "Have These Reviews Changed?",
+    "section": "What this project is about",
+    "text": "What this project is about\nWhen you shop online, a product’s star average and a few top reviews have to answer two questions:\n\nHow sure can I be about that average? 4.4★ from 22 ratings and 4.4★ from 11,000 ratings are not the same evidence.\nDoes it still describe the product sold today? Products change: a new supplier, a new formula, new packaging. A 4.5★ average built over four years can hide a product that got worse last spring.\n\nReal Deal is a Chrome extension for amazon.in that answers both. It reads the reviews you open, groups their sentences into themes (“battery life”, “missing pieces in the box”), and tests whether each theme’s share of reviews really changed or could just be luck.\nEverything runs inside your browser: the language model, the statistics and the storage. The extension makes no network requests, and Chrome enforces that.\nWhat to expect: what the extension shows, the statistics behind each part, how I checked the method on real Amazon data, and what went wrong along the way."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-it-shows",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-it-shows",
+    "title": "Have These Reviews Changed?",
+    "section": "What it shows",
+    "text": "What it shows\n\n\n\n\n\n\n\n\nWhere\nWhat you see\nWhat it tells you\n\n\n\n\nProduct page\nlikely 3.8–4.7 · low data next to the stars\nHow uncertain the average is\n\n\nSide panel\nThemes over time, each with a verdict\nWhat reviewers talk about, and whether that changed\n\n\nSearch results\nA cautious score on every result, and “sort this page”\nWhich ratings you can trust, not just which are highest\n\n\nSide panel\nReview pattern check\nUnusual floods of reviews: signals worth reading about, never “fake”\n\n\n\n\n\n\n\n\n\nThemes over time for a pair of Sony headphones (493 reviews over 40 months). Each theme has a monthly chart, its share before and after the most likely change, and a verdict.\n\n\n\n\n\n\n\nSearch results: 21 of 22 results scored, with the top five by score. The score favours ratings backed by many reviews."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#how-it-works",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#how-it-works",
+    "title": "Have These Reviews Changed?",
+    "section": "How it works",
+    "text": "How it works\n\n1. How sure is the average?\nThe product page shows the share of 1★ to 5★ ratings and the number of ratings. From them I rebuild the counts and treat the true star shares as unknown, with a Dirichlet posterior (a Jeffreys prior, α = 0.5 for each star level). Drawing 4,000 samples of the average gives a 90% range: likely 3.8–4.7.\nI tried a uniform prior first. On products where almost every rating is 5★, its “90%” range held the true value only 74% of the time in simulation. The Jeffreys prior brought that to 88–91%.\n\n\n2. What do reviewers talk about?\n\nReviews are split into sentences. Hinglish and page junk (“The media could not be loaded”) are removed.\nEach sentence becomes a vector using all-MiniLM-L6-v2, a 23 MB sentence model that runs in a Web Worker inside the extension.\nSpherical k-means groups similar sentences. The number of themes (3 to 8) is chosen by the silhouette score.\nc-TF-IDF (the labelling idea from BERTopic) finds each theme’s keywords. If Chrome’s built-in Gemini Nano is available, it turns them into a readable name. The name is kept only if it uses the theme’s own keywords.\n\nA review “mentions” a theme if any of its sentences falls into it. That gives, for each theme and month, k of n reviews mentioned it.\n\n\n3. Did the theme’s share change?\nFor every month boundary, the test compares the share before and after with a binomial likelihood ratio and keeps the largest. Searching every month for the biggest difference will always find something. So the p-value comes from a permutation test: shuffle which reviews mention the theme 999 times, redo the whole search each time, and see how often chance alone produces a difference this large.\nA product has several themes, so several tests run at once. Benjamini–Hochberg controls the false-discovery rate across them. A theme is shown as Real change only if q ≤ 0.10.\nThe star-filter trap. Amazon shows at most 100 reviews per sort or filter. To reach older reviews, you have to open filters like “1★ only”. But if the later months come mostly from the 1★ filter, every complaint theme seems to “rise”. In those cases the test switches to a Cochran–Mantel–Haenszel version that compares 1★ reviews only with 1★ reviews, 5★ only with 5★, and so on.\nThe Sony example above shows why this matters. “Good sound quality” fell from 62% to 44% of reviews, which looks dramatic. But much of the recent sample came from the 1★ filter. Compared like with like, the drop is no larger than chance would produce, so the verdict is Could just be luck.\n\n\n4. Search results: which rating can you trust?\nSorting by average rating puts 5.0★ from 3 ratings above 4.3★ from 2,000. Instead, each result gets\n\\[\\tilde r = \\frac{C\\,m + N\\,\\bar r}{C + N} - 1.645\\,\\frac{\\sigma}{\\sqrt{C+N}},\\]\na rating pulled towards a typical one, then lowered by its uncertainty. I estimated the constants from the research data: typical rating m = 3.98★, per-review spread σ = 1.34, prior weight C ≈ 5 ratings. So 4.6★ from 9 ratings scores about 3.79, while 4.3★ from 2,000 scores about 4.25. “Sort this page” reorders only the current page. It never loads more.\n\n\n5. Unusual floods of reviews\nThe check finds the busiest 14-day window and asks how likely that many reviews would be at the product’s usual pace, using a Poisson tail corrected for having searched every window. It reports a signal only if the burst is very unlikely (p &lt; 0.001) and those reviews were also clearly more positive or more often unverified than the rest."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#does-it-work-checking-on-real-data",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#does-it-work-checking-on-real-data",
+    "title": "Have These Reviews Changed?",
+    "section": "Does it work? Checking on real data",
+    "text": "Does it work? Checking on real data\nI checked the method in a Python notebook on the McAuley Lab Amazon Reviews 2023 dataset (All_Beauty), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.\nFalse alarms and power. In simulation, with a theme at 10% of reviews:\n\n\n\nShare of simulated products flagged. The left point (no change) is the false-alarm rate, about 5% at every size. The other points show how often a real change is caught.\n\n\nThe false-alarm rate stays near 5% at every size. With 300 reviews, a rise from 10% to 25% is caught 85% of the time. With 100 reviews, only 43% of the time. So “Could just be luck” with about 100 reviews means “not enough reviews to tell”, not “nothing changed”. The panel says so.\nA real product change, found at the right month. Across 50 products with long histories, the test flagged 86 theme changes in 33 products. The clearest was a pack of wipes. A theme about packaging, new, open rose from 8% to 40% of reviews from June 2021 (q = 0.008). I then read the reviews: “They changed the packaging. They no longer use the good snap shut packaging”, and “New packaging awful… Impossible to open!!!”\n\n\n\nReviews of the wipes product mentioning packaging or opening, per half-year, with 95% ranges. (A keyword version of the theme, for illustration.)\n\n\nNot every detected change is a product change. Reading the other flagged products, I found changes in who buys the product (a spray bottle that went from “curly hair” to “plant misting” reviews), shifts in reviewing culture (incentivized reviews before Amazon’s 2016 ban), and listings that bundle several products. The statistics can say that something changed. Only reading can say what. That’s why every theme in the panel shows its most typical sentences.\nA suspicious burst. One eye cream received 109 reviews in 14 days, against a usual pace of about 3. Those reviews averaged 4.81★ against 4.27★, and 99% were unverified against 34%. This is exactly the pattern the Review pattern check looks for. It’s still a signal, not proof."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-went-wrong-and-what-it-taught-me",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-went-wrong-and-what-it-taught-me",
+    "title": "Have These Reviews Changed?",
+    "section": "What went wrong, and what it taught me",
+    "text": "What went wrong, and what it taught me\nI logged every problem, why it happened, and why my tests didn’t catch it earlier: 53 entries so far. A few that changed the design:\n\n“Collect everything” isn’t possible. Amazon shows at most 100 reviews per sort or filter. The extension now works through filters, merges them without duplicates, and shows how much of the history it holds (“493 of 7,469 reviews, 40 months”).\nStratifying all the time hid real changes. The star-level test is less powerful, so it now runs only when filtered views were used and the collection is incomplete.\nA small language model fails in quiet ways. Gemini Nano sometimes added numbers that weren’t in the results, wrote “over 100” for 87, or turned “fell” into “rose”. Every summary is now checked against the test results: each number must appear there, and no change can be claimed when none is significant. If a check fails, a plain template is used instead.\nStatistics people can read. Early versions showed p, q and Δ. Most people can’t use those. The panel now shows a verdict (Real change, Could just be luck, Not proven), a monthly chart and one plain sentence with the counts. The numbers are under “Details”.\nPresent in the page isn’t the same as visible. The search score badges passed every test but weren’t visible in Chrome: Amazon clips the title link they were placed in. Tests on saved pages can’t see CSS."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#is-this-new",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#is-this-new",
+    "title": "Have These Reviews Changed?",
+    "section": "Is this new?",
+    "text": "Is this new?\nThe building blocks are established, and this project applies them rather than inventing them:\n\nc-TF-IDF topic labels: Grootendorst, BERTopic (2022).\nChange-point tests with permutation p-values: a standard non-parametric approach for scanning statistics.\nFalse-discovery rate: Benjamini & Hochberg (1995).\nShrinking ratings with few votes: the Bayesian average used by many ranking systems, here with a lower confidence bound and constants estimated from data.\n\nExisting tools answer different questions. Amazon’s “Customers say” summarises reviews, but has no time dimension and no uncertainty. Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their own servers. Keepa tracks price history, not reviews.\nWhat Real Deal adds is the combination: per-theme change tests over time, with false-discovery control and a fix for Amazon’s star filters, running entirely on-device, and explained in plain language."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#limitations-and-next-steps",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#limitations-and-next-steps",
+    "title": "Have These Reviews Changed?",
+    "section": "Limitations and next steps",
+    "text": "Limitations and next steps\n\nIt sees only the reviews you open, and Amazon decides which 100 reviews each view shows.\nAbout 100 reviews only detect large shifts.\nFailures can rise over time as units age, even if the product hasn’t changed.\nA theme can merge two related topics.\nHindi and Hinglish reviews are skipped, because the model is English-only.\n\nNext, I’d add a multilingual model for Hindi and Hinglish, split themes that merge two topics, and support Flipkart.\nThe takeaway: a star average is one number standing in for years of changing experiences. Asking how sure and since when turns it into something you can actually decide with, and both questions can be answered on your own computer.\nThe formulas, the validation notebook and the full log of decisions are in the GitHub repo."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "",
+    "text": "Code: github.com/Saminay786/promo-optimization-engine · Status: complete"
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#what-this-project-is-about",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#what-this-project-is-about",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "What this project is about",
+    "text": "What this project is about\nRetailers usually judge a promotion by comparing sales during it with a normal week. That number mixes the discount’s real effect with everything else happening at the same time.\nThis project separates them. It measures how many extra sales a discount actually causes, uses that to plan which product gets which discount in which week, checks the result with a second model, and asks whether a store test could prove it.\nWhat to expect: a simple example of why promo sales mislead, how each step works, the results, and how much they can be trusted."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#one-discount-four-stories",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#one-discount-four-stories",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "One discount, four stories",
+    "text": "One discount, four stories\nA box of cereal goes 20% off and sales double, from 100 boxes to 200. Success?\nMaybe not. That week the cereal was probably also on the front of the flyer and on an end-of-aisle display. Some of those 200 boxes would have sold anyway, now at a lower price. And some shoppers simply switched from the cereal next to it.\nAll four stories are hidden inside “sales doubled”. Plan from that number, and you keep paying for discounts that don’t earn their cost."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#how-it-works",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#how-it-works",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "How it works",
+    "text": "How it works\nData. dunnhumby’s The Complete Journey: two years of grocery shopping by about 2,500 households, with flyer and display records. I used the 137 top-selling products over 99 weeks.\nMeasuring the real effect. I asked: in weeks when the discount was deeper than usual, beyond what the flyer, display, season and recent sales would explain, did sales rise more than expected? That’s the idea behind Double ML: remove everything else first, so the discount only gets credit for what’s left. A placebo test with shuffled discounts checks that the method doesn’t invent effects.\nPlanning the calendar. Over 8 weeks with 10 promo slots a week, each product can get 10%, 20% or 30% off, or nothing, under a budget, a cap per category and no back-to-back weeks. Because these rules interact, I used an integer program solved with OR-Tools CP-SAT, and compared it with a common rule of thumb: deepest discount on the best sellers.\nChecking from the top down. A Bayesian marketing mix model (PyMC-Marketing) of weekly sales for 8 whole categories, with discount, flyer and display as levers, allowing for lingering effects and diminishing returns.\nDesigning the test. Run the new calendar in half the stores and compare weekly promo margin, using CUPED (adjusting for each store’s pre-test sales) to cut noise. I simulated it 1,000 times on real store history."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#results",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#results",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Results",
+    "text": "Results\n\n\n\n\n\n\n\n\n\nEffect (θ)\nWhat 10% off does\n\n\n\n\nNaive: promo weeks vs. normal weeks\n3.49\n+42% units\n\n\nDouble ML: other factors removed\n2.51 (95% CI 2.18–2.85)\n+29% units\n\n\nPlacebo: discounts shuffled\n0.01\nnothing, as it should\n\n\n\nThe naive view overstates the discount by about 40%, because it gives the discount credit for the flyer and display. And 44% of promo-week sales would have happened anyway.\nPlanning pays. Same rules, same $5k budget:\n\n\n\n\nExtra margin\nBudget used\n\n\n\n\n“Deepest discount on top sellers”\n$60\nall of it\n\n\nOptimised calendar\n$719\n37% less\n\n\n\nThe rule of thumb loses because 30% off only pays for itself on about 1 in 4 products. On the rest, the discount given on sales that would have happened anyway outweighs the extra sales.\n\n\n\nMargin returned per $1 of retailer discount, by category (94% credible intervals).\n\n\nMost discounts don’t pay for themselves. In 7 of 8 categories, each $1 of discount brings back less than $1 of margin. Soft drinks return about $0.69, and only frozen pizza clears break-even.\nA surprise. Both models rank the categories the same way, but the category-level effect is only about half the product-level one. That’s cannibalisation: when one cereal is discounted, part of its jump is taken from the cereal next to it. So the $719 above is probably about twice too high. The comparison still holds, since both plans use the same estimates, but the dollar figure is optimistic.\nCould a test prove it?\n\n\n\nChance that an 8-week test detects a given true lift, with and without CUPED.\n\n\nThe test is fair (about 5% false alarms with no real change), but with 84 usable stores it reliably detects only lifts of 13% or more. The calendar is expected to add about 3%, which it would catch only about 10% of the time, even with CUPED tripling its power. So a “not significant” result wouldn’t mean the calendar failed. Proving 3% would need about 1,500 stores."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#is-this-new",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#is-this-new",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Is this new?",
+    "text": "Is this new?\nNo, not as an idea. Each piece is well established, and this project applies them rather than inventing them:\n\nDouble ML: Chernozhukov et al., Double/Debiased Machine Learning for Treatment and Structural Parameters (The Econometrics Journal, 2018).\nWhere the promo bump comes from: van Heerde, Leeflang & Wittink, Decomposing the Sales Promotion Bump with Store Data (Marketing Science, 2004). They found that, on average, about a third of the bump comes from shoppers switching brands.\nPromo planning as an integer program: Cohen et al., The Impact of Linear Optimization on Promotion Planning (Operations Research, 2017). They estimated a potential profit gain of about 3%, close to the gain my optimiser predicts.\nMarketing mix models with carryover and diminishing returns: Google, Bayesian Methods for Media Mix Modeling with Carryover and Shape Effects (2017).\nCUPED: Deng, Xu, Kohavi & Walker, Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data (WSDM 2013).\n\nWhat this project adds is small and practical: it connects the four steps on one public dataset, uses a second model to catch the first one’s overstatement, and checks before running a test whether that test could detect the predicted gain."
+  },
+  {
+    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#limitations-and-next-steps",
+    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#limitations-and-next-steps",
+    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
+    "section": "Limitations and next steps",
+    "text": "Limitations and next steps\nThe data is observational, so the Double ML result holds only if I’ve measured what drives both promo decisions and sales. There’s no cost data: margin (30% of price), supplier funding (50% of the discount) and display costs are assumptions. Cannibalisation and stock-piling are handled with simple rules, and the 2,500-household panel makes the test far weaker than a real retailer’s full store sales would. Next, I’d scale product-level effects to category level before optimising, model stock-piling directly, and compare other test designs, such as alternating weeks.\nThe takeaway: judge a promotion by the sales it creates, not the sales it records. Almost half of promo volume was going to happen anyway.\nFull code, results and every number above are in the GitHub repo."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Samina Yasmin",
+    "section": "",
+    "text": "Hi, I’m Samina. I’m curious about why people pick what they pick, and why models do too.\nI started out at IIT Madras, modelling how people behave at work. Now I study how models behave with data. Turns out they’re not so different: both are confident, and both are sometimes wrong.\nHere I take things apart to see how they really work, and share what I find."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Samina Yasmin",
+    "section": "Education",
+    "text": "Education\nIIT Madras | MS (Research), Department of Management Studies\nModelled human behaviour in organisations using statistics: survey studies, regression, moderation and mediation analysis.\nUniversity of Mumbai | B.Tech, Electronics Engineering | 2021"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "Samina Yasmin",
+    "section": "Experience",
+    "text": "Experience\nDecision Science Analyst | 2025 – present\nBuilding pricing, forecasting and demand-sourcing models for industrial clients.\nAmerican Express, Data Analytics & Risk Tech. Lab (via IIT Madras) | Research Associate | 2023 – 2025"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Have These Reviews Changed?\n\n\nA Chrome extension that tests, on your own computer, whether an Amazon product’s reviews really changed over time\n\n\n\nstatistics\n\nNLP\n\nchange-point detection\n\nproduct\n\n\n\n\nStar averages hide two things: how sure we can be about them, and whether the product changed since most reviews were written. I built Real Deal, a Chrome extension for amazon.in that finds review themes with an on-device language model and tests whether each theme’s share changed, with permutation tests and false-discovery control. No servers, no network calls.\n\n\n\n\n\n\nNov 22, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nSame Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nAlmost Half of Promo Sales Would Have Happened Anyway\n\n\nMeasuring what grocery discounts really cause, and planning promotions around it\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\n\nA discount that doubles sales can still lose money. Using two years of real grocery data, I measured what discounts actually cause, built a promo calendar around it, checked it with a second model, and asked whether a store test could even prove it works.\n\n\n\n\n\n\nNov 8, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html",
     "href": "posts/2026-11-16-fraud-score-to-decision/index.html",
     "title": "Same Fraud Score, Different Decision",
@@ -54,82 +187,5 @@
     "title": "Same Fraud Score, Different Decision",
     "section": "Limitations and next steps",
     "text": "Limitations and next steps\nThe costs are assumptions, there are few frauds, and the data covers only two days with no customer IDs. Next, I’d move the same decision layer to the larger IEEE-CIS dataset, keep each customer in only one of training or testing, and simulate chargebacks arriving weeks later, as they do in practice.\nThe takeaway: a fraud model’s job is to estimate risk. Deciding what to do with that risk is a separate job, and it’s where most of the money is.\nFull details, formulas and a one-page decision memo are in the GitHub repo."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Same Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nAlmost Half of Promo Sales Would Have Happened Anyway\n\n\nMeasuring what grocery discounts really cause, and planning promotions around it\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\n\nA discount that doubles sales can still lose money. Using two years of real grocery data, I measured what discounts actually cause, built a promo calendar around it, checked it with a second model, and asked whether a store test could even prove it works.\n\n\n\n\n\n\nNov 8, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "Samina Yasmin",
-    "section": "",
-    "text": "Hi, I’m Samina. I’m curious about why people pick what they pick, and why models do too.\nI started out at IIT Madras, modelling how people behave at work. Now I study how models behave with data. Turns out they’re not so different: both are confident, and both are sometimes wrong.\nHere I take things apart to see how they really work, and share what I find."
-  },
-  {
-    "objectID": "about.html#education",
-    "href": "about.html#education",
-    "title": "Samina Yasmin",
-    "section": "Education",
-    "text": "Education\nIIT Madras | MS (Research), Department of Management Studies\nModelled human behaviour in organisations using statistics: survey studies, regression, moderation and mediation analysis.\nUniversity of Mumbai | B.Tech, Electronics Engineering | 2021"
-  },
-  {
-    "objectID": "about.html#experience",
-    "href": "about.html#experience",
-    "title": "Samina Yasmin",
-    "section": "Experience",
-    "text": "Experience\nDecision Science Analyst | 2025 – present\nBuilding pricing, forecasting and demand-sourcing models for industrial clients.\nAmerican Express, Data Analytics & Risk Tech. Lab (via IIT Madras) | Research Associate | 2023 – 2025"
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "",
-    "text": "Code: github.com/Saminay786/promo-optimization-engine · Status: complete"
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#what-this-project-is-about",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#what-this-project-is-about",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "What this project is about",
-    "text": "What this project is about\nRetailers usually judge a promotion by comparing sales during it with a normal week. That number mixes the discount’s real effect with everything else happening at the same time.\nThis project separates them. It measures how many extra sales a discount actually causes, uses that to plan which product gets which discount in which week, checks the result with a second model, and asks whether a store test could prove it.\nWhat to expect: a simple example of why promo sales mislead, how each step works, the results, and how much they can be trusted."
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#one-discount-four-stories",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#one-discount-four-stories",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "One discount, four stories",
-    "text": "One discount, four stories\nA box of cereal goes 20% off and sales double, from 100 boxes to 200. Success?\nMaybe not. That week the cereal was probably also on the front of the flyer and on an end-of-aisle display. Some of those 200 boxes would have sold anyway, now at a lower price. And some shoppers simply switched from the cereal next to it.\nAll four stories are hidden inside “sales doubled”. Plan from that number, and you keep paying for discounts that don’t earn their cost."
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#how-it-works",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#how-it-works",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "How it works",
-    "text": "How it works\nData. dunnhumby’s The Complete Journey: two years of grocery shopping by about 2,500 households, with flyer and display records. I used the 137 top-selling products over 99 weeks.\nMeasuring the real effect. I asked: in weeks when the discount was deeper than usual, beyond what the flyer, display, season and recent sales would explain, did sales rise more than expected? That’s the idea behind Double ML: remove everything else first, so the discount only gets credit for what’s left. A placebo test with shuffled discounts checks that the method doesn’t invent effects.\nPlanning the calendar. Over 8 weeks with 10 promo slots a week, each product can get 10%, 20% or 30% off, or nothing, under a budget, a cap per category and no back-to-back weeks. Because these rules interact, I used an integer program solved with OR-Tools CP-SAT, and compared it with a common rule of thumb: deepest discount on the best sellers.\nChecking from the top down. A Bayesian marketing mix model (PyMC-Marketing) of weekly sales for 8 whole categories, with discount, flyer and display as levers, allowing for lingering effects and diminishing returns.\nDesigning the test. Run the new calendar in half the stores and compare weekly promo margin, using CUPED (adjusting for each store’s pre-test sales) to cut noise. I simulated it 1,000 times on real store history."
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#results",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#results",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "Results",
-    "text": "Results\n\n\n\n\n\n\n\n\n\nEffect (θ)\nWhat 10% off does\n\n\n\n\nNaive: promo weeks vs. normal weeks\n3.49\n+42% units\n\n\nDouble ML: other factors removed\n2.51 (95% CI 2.18–2.85)\n+29% units\n\n\nPlacebo: discounts shuffled\n0.01\nnothing, as it should\n\n\n\nThe naive view overstates the discount by about 40%, because it gives the discount credit for the flyer and display. And 44% of promo-week sales would have happened anyway.\nPlanning pays. Same rules, same $5k budget:\n\n\n\n\nExtra margin\nBudget used\n\n\n\n\n“Deepest discount on top sellers”\n$60\nall of it\n\n\nOptimised calendar\n$719\n37% less\n\n\n\nThe rule of thumb loses because 30% off only pays for itself on about 1 in 4 products. On the rest, the discount given on sales that would have happened anyway outweighs the extra sales.\n\n\n\nMargin returned per $1 of retailer discount, by category (94% credible intervals).\n\n\nMost discounts don’t pay for themselves. In 7 of 8 categories, each $1 of discount brings back less than $1 of margin. Soft drinks return about $0.69, and only frozen pizza clears break-even.\nA surprise. Both models rank the categories the same way, but the category-level effect is only about half the product-level one. That’s cannibalisation: when one cereal is discounted, part of its jump is taken from the cereal next to it. So the $719 above is probably about twice too high. The comparison still holds, since both plans use the same estimates, but the dollar figure is optimistic.\nCould a test prove it?\n\n\n\nChance that an 8-week test detects a given true lift, with and without CUPED.\n\n\nThe test is fair (about 5% false alarms with no real change), but with 84 usable stores it reliably detects only lifts of 13% or more. The calendar is expected to add about 3%, which it would catch only about 10% of the time, even with CUPED tripling its power. So a “not significant” result wouldn’t mean the calendar failed. Proving 3% would need about 1,500 stores."
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#is-this-new",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#is-this-new",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "Is this new?",
-    "text": "Is this new?\nNo, not as an idea. Each piece is well established, and this project applies them rather than inventing them:\n\nDouble ML: Chernozhukov et al., Double/Debiased Machine Learning for Treatment and Structural Parameters (The Econometrics Journal, 2018).\nWhere the promo bump comes from: van Heerde, Leeflang & Wittink, Decomposing the Sales Promotion Bump with Store Data (Marketing Science, 2004). They found that, on average, about a third of the bump comes from shoppers switching brands.\nPromo planning as an integer program: Cohen et al., The Impact of Linear Optimization on Promotion Planning (Operations Research, 2017). They estimated a potential profit gain of about 3%, close to the gain my optimiser predicts.\nMarketing mix models with carryover and diminishing returns: Google, Bayesian Methods for Media Mix Modeling with Carryover and Shape Effects (2017).\nCUPED: Deng, Xu, Kohavi & Walker, Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data (WSDM 2013).\n\nWhat this project adds is small and practical: it connects the four steps on one public dataset, uses a second model to catch the first one’s overstatement, and checks before running a test whether that test could detect the predicted gain."
-  },
-  {
-    "objectID": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#limitations-and-next-steps",
-    "href": "posts/2026-11-08-promo-sales-that-would-happen-anyway/index.html#limitations-and-next-steps",
-    "title": "Almost Half of Promo Sales Would Have Happened Anyway",
-    "section": "Limitations and next steps",
-    "text": "Limitations and next steps\nThe data is observational, so the Double ML result holds only if I’ve measured what drives both promo decisions and sales. There’s no cost data: margin (30% of price), supplier funding (50% of the discount) and display costs are assumptions. Cannibalisation and stock-piling are handled with simple rules, and the 2,500-household panel makes the test far weaker than a real retailer’s full store sales would. Next, I’d scale product-level effects to category level before optimising, model stock-piling directly, and compare other test designs, such as alternating weeks.\nThe takeaway: judge a promotion by the sales it creates, not the sales it records. Almost half of promo volume was going to happen anyway.\nFull code, results and every number above are in the GitHub repo."
   }
 ]
