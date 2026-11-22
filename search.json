@@ -4,7 +4,7 @@
     "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html",
     "title": "Have These Reviews Changed?",
     "section": "",
-    "text": "Code: github.com/Saminay786/real-deal · Status: working prototype (Chrome, amazon.in)"
+    "text": "Code: github.com/Saminay786/real-deal (open source, MIT) · Try it: download · Status: working prototype (Chrome, amazon.in)"
   },
   {
     "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#what-this-project-is-about",
@@ -47,6 +47,13 @@
     "title": "Have These Reviews Changed?",
     "section": "Is this new?",
     "text": "Is this new?\nThe building blocks are established, and this project applies them rather than inventing them:\n\nc-TF-IDF topic labels: Grootendorst, BERTopic (2022).\nChange-point tests with permutation p-values: a standard non-parametric approach for scanning statistics.\nFalse-discovery rate: Benjamini & Hochberg (1995).\nShrinking ratings with few votes: the Bayesian average used by many ranking systems, here with a lower confidence bound and constants estimated from data.\n\nExisting tools answer different questions. Amazon’s “Customers say” summarises reviews, but has no time dimension and no uncertainty. Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their own servers. Keepa tracks price history, not reviews.\nWhat Real Deal adds is the combination: per-theme change tests over time, with false-discovery control and a fix for Amazon’s star filters, running entirely on-device, and explained in plain language."
+  },
+  {
+    "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#try-it-yourself",
+    "href": "posts/2026-11-22-real-deal-amazon-reviews/index.html#try-it-yourself",
+    "title": "Have These Reviews Changed?",
+    "section": "Try it yourself",
+    "text": "Try it yourself\nReal Deal is open source, and you can install it without any coding:\n\nDownload real-deal-v0.1.0.zip from the latest release on GitHub.\nUnzip it and keep the real-deal folder somewhere permanent.\nIn Chrome, open chrome://extensions, turn on Developer mode, click Load unpacked and choose the folder.\n\nThen open any product on amazon.in and click the Real Deal icon. A box at the top of the side panel always shows the next step. The user guide walks through installing, collecting reviews and reading the results, with screenshots."
   },
   {
     "objectID": "posts/2026-11-22-real-deal-amazon-reviews/index.html#limitations-and-next-steps",
