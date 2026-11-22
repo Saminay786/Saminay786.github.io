@@ -12,239 +12,91 @@
 <body>
 <header id="title-block-header">
 <h1 class="title">Have These Reviews Changed?</h1>
-<p class="subtitle">A Chrome extension that tests, on your own computer,
-whether an Amazon product’s reviews really changed over time</p>
+<p class="subtitle">A Chrome extension that tests, on your own computer, whether an Amazon product’s reviews really changed over time</p>
 </header>
-<p hidden><em>Medium-friendly copy of <a
-href="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/">this
-post</a>: no tables, no math markup, one image per row.</em></p>
-<p><strong>Code:</strong> <a
-href="https://github.com/Saminay786/real-deal">github.com/Saminay786/real-deal</a>
-· <strong>Status:</strong> working prototype (Chrome, amazon.in)</p>
+<p hidden><em>Medium-friendly copy of <a href="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/">this post</a>: no tables, no math markup, one image per row.</em></p>
+<p><strong>Code:</strong> <a href="https://github.com/Saminay786/real-deal">github.com/Saminay786/real-deal</a> · <strong>Status:</strong> working prototype (Chrome, amazon.in)</p>
 <h2 id="what-this-project-is-about">What this project is about</h2>
-<p>When you shop online, a product’s star average and a few top reviews
-have to answer two questions:</p>
+<p>When you shop online, a product’s star average and a few top reviews have to answer two questions:</p>
 <ol type="1">
-<li><strong>How sure can I be about that average?</strong> 4.4★ from 22
-ratings and 4.4★ from 11,000 ratings are not the same evidence.</li>
-<li><strong>Does it still describe the product sold today?</strong>
-Products change: a new supplier, a new formula, new packaging. A 4.5★
-average built over four years can hide a product that got worse last
-spring.</li>
+<li><strong>How sure can I be about that average?</strong> 4.4★ from 22 ratings and 4.4★ from 11,000 ratings are not the same evidence.</li>
+<li><strong>Does it still describe the product sold today?</strong> Products change: a new supplier, a new formula, new packaging. A 4.5★ average built over four years can hide a product that got worse last spring.</li>
 </ol>
-<p><strong>Real Deal</strong> is a Chrome extension for amazon.in that
-answers both. It reads the reviews you open, groups their sentences into
-themes (“battery life”, “missing pieces in the box”), and tests whether
-each theme’s share of reviews <strong>really changed</strong> or
-<strong>could just be luck</strong>.</p>
-<p>Everything runs <strong>inside your browser</strong>: the language
-model, the statistics and the storage. The extension makes no network
-requests, and Chrome enforces that.</p>
-<p><strong>What to expect:</strong> what the extension shows, the
-statistics behind each part, how I checked the method on real Amazon
-data, and what went wrong along the way.</p>
+<p><strong>Real Deal</strong> is a Chrome extension for amazon.in that answers both. It reads the reviews you open, groups their sentences into themes (“battery life”, “missing pieces in the box”), and tests whether each theme’s share of reviews <strong>really changed</strong> or <strong>could just be luck</strong>.</p>
+<p>Everything runs <strong>inside your browser</strong>: the language model, the statistics and the storage. The extension makes no network requests, and Chrome enforces that.</p>
+<p><strong>What to expect:</strong> what the extension shows, the statistics behind each part, how I checked the method on real Amazon data, and what went wrong along the way.</p>
 <h2 id="what-it-shows">What it shows</h2>
 <ul>
-<li><strong>Product page:</strong>
-<code>likely 3.8–4.7 · low data</code> next to the stars, showing how
-uncertain the average is.</li>
-<li><strong>Side panel, themes over time:</strong> what reviewers talk
-about, and whether each theme’s share changed. Every theme gets a
-verdict.</li>
-<li><strong>Search results:</strong> a cautious score on every result,
-and “sort this page”, so you see which ratings you can trust, not just
-which are highest.</li>
-<li><strong>Side panel, review pattern check:</strong> unusual floods of
-reviews. These are <em>signals</em> worth reading about, never
-“fake”.</li>
+<li><strong>Product page:</strong> <code>likely 3.8–4.7 · low data</code> next to the stars, showing how uncertain the average is.</li>
+<li><strong>Side panel, themes over time:</strong> what reviewers talk about, and whether each theme’s share changed. Every theme gets a verdict.</li>
+<li><strong>Search results:</strong> a cautious score on every result, and “sort this page”, so you see which ratings you can trust, not just which are highest.</li>
+<li><strong>Side panel, review pattern check:</strong> unusual floods of reviews. These are <em>signals</em> worth reading about, never “fake”.</li>
 </ul>
 <figure><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/panel-real-change.png" alt="Side panel card for the theme &#39;good, calling, everything&#39; marked Real change: monthly share drops from 30% to 12% at a dashed line in January 2026; change box from -31 to -7 points, entirely left of zero; typical sentences before are &#39;Not that good&#39;, &#39;Not good for calling&#39;, after are &#39;Good no issues&#39;, &#39;Everything is good&#39;." /><figcaption>A Real change on a Realme neckband (336 reviews over 29 months). Short verdicts like “Not good for calling” fell from 30% to 12% of reviews after January 2026. The green box is the likely size of the change, and it stays clear of 0.</figcaption></figure>
 <figure><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/panel-search.png" alt="Side panel listing search results scored, a &#39;Restore Amazon&#39;s order&#39; button, and the top 5 products by score, e.g. 4.19 for a 4.2-star product with 32,827 ratings." /><figcaption>Search results: 21 of 22 results scored, with the top five by score. The score favours ratings backed by many reviews.</figcaption></figure>
 <h2 id="how-it-works">How it works</h2>
 <h3 id="how-sure-is-the-average">1. How sure is the average?</h3>
-<p>The product page shows the share of 1★ to 5★ ratings and the number
-of ratings. From them I rebuild the counts and treat the true star
-shares as unknown, with a <strong>Dirichlet posterior</strong> (a
-Jeffreys prior, α = 0.5 for each star level). Drawing 4,000 samples of
-the average gives a 90% range: <code>likely 3.8–4.7</code>.</p>
-<p>I tried a uniform prior first. On products where almost every rating
-is 5★, its “90%” range held the true value only 74% of the time in
-simulation. The Jeffreys prior brought that to 88–91%.</p>
-<h3 id="what-do-reviewers-talk-about">2. What do reviewers talk
-about?</h3>
+<p>The product page shows the share of 1★ to 5★ ratings and the number of ratings. From them I rebuild the counts and treat the true star shares as unknown, with a <strong>Dirichlet posterior</strong> (a Jeffreys prior, α = 0.5 for each star level). Drawing 4,000 samples of the average gives a 90% range: <code>likely 3.8–4.7</code>.</p>
+<p>I tried a uniform prior first. On products where almost every rating is 5★, its “90%” range held the true value only 74% of the time in simulation. The Jeffreys prior brought that to 88–91%.</p>
+<h3 id="what-do-reviewers-talk-about">2. What do reviewers talk about?</h3>
 <ul>
-<li>Reviews are split into sentences. Hinglish and page junk (“The media
-could not be loaded”) are removed.</li>
-<li>Each sentence becomes a vector using
-<strong>all-MiniLM-L6-v2</strong>, a 23 MB sentence model that runs in a
-Web Worker inside the extension.</li>
-<li><strong>Spherical k-means</strong> groups similar sentences. The
-number of themes (3 to 8) is chosen by the silhouette score.</li>
-<li><strong>c-TF-IDF</strong> (the labelling idea from BERTopic) finds
-each theme’s keywords. If Chrome’s built-in <strong>Gemini Nano</strong>
-is available, it turns them into a readable name. The name is kept only
-if it uses the theme’s own keywords.</li>
+<li>Reviews are split into sentences. Hinglish and page junk (“The media could not be loaded”) are removed.</li>
+<li>Each sentence becomes a vector using <strong>all-MiniLM-L6-v2</strong>, a 23 MB sentence model that runs in a Web Worker inside the extension.</li>
+<li><strong>Spherical k-means</strong> groups similar sentences. The number of themes (3 to 8) is chosen by the silhouette score.</li>
+<li><strong>c-TF-IDF</strong> (the labelling idea from BERTopic) finds each theme’s keywords. If Chrome’s built-in <strong>Gemini Nano</strong> is available, it turns them into a readable name. The name is kept only if it uses the theme’s own keywords.</li>
 </ul>
-<p>A review “mentions” a theme if any of its sentences falls into it.
-That gives, for each theme and month, <em>k of n reviews mentioned
-it</em>.</p>
-<h3 id="did-the-themes-share-change">3. Did the theme’s share
-change?</h3>
-<p>For every month boundary, the test compares the share before and
-after with a <strong>binomial likelihood ratio</strong> and keeps the
-largest. Searching every month for the biggest difference will always
-find <em>something</em>. So the p-value comes from a <strong>permutation
-test</strong>: shuffle which reviews mention the theme 999 times, redo
-the whole search each time, and see how often chance alone produces a
-difference this large.</p>
-<p>A product has several themes, so several tests run at once.
-<strong>Benjamini–Hochberg</strong> controls the false-discovery rate
-across them. A theme is shown as <strong>Real change</strong> only if q
-≤ 0.10.</p>
-<p><strong>The star-filter trap.</strong> Amazon shows at most 100
-reviews per sort or filter. To reach older reviews, you have to open
-filters like “1★ only”. But if the later months come mostly from the 1★
-filter, every complaint theme seems to “rise”. In those cases the test
-switches to a <strong>Cochran–Mantel–Haenszel</strong> version that
-compares 1★ reviews only with 1★ reviews, 5★ only with 5★, and so
-on.</p>
-<p>The Sony headphones below show why this matters. “Good sound quality”
-fell from 62% to 44% of reviews, which looks dramatic. But much of the
-recent sample came from the 1★ filter. Compared like with like, the drop
-is no larger than chance would produce, so the verdict is <strong>Could
-just be luck</strong>.</p>
+<p>A review “mentions” a theme if any of its sentences falls into it. That gives, for each theme and month, <em>k of n reviews mentioned it</em>.</p>
+<h3 id="did-the-themes-share-change">3. Did the theme’s share change?</h3>
+<p>For every month boundary, the test compares the share before and after with a <strong>binomial likelihood ratio</strong> and keeps the largest. Searching every month for the biggest difference will always find <em>something</em>. So the p-value comes from a <strong>permutation test</strong>: shuffle which reviews mention the theme 999 times, redo the whole search each time, and see how often chance alone produces a difference this large.</p>
+<p>A product has several themes, so several tests run at once. <strong>Benjamini–Hochberg</strong> controls the false-discovery rate across them. A theme is shown as <strong>Real change</strong> only if q ≤ 0.10.</p>
+<p><strong>The star-filter trap.</strong> Amazon shows at most 100 reviews per sort or filter. To reach older reviews, you have to open filters like “1★ only”. But if the later months come mostly from the 1★ filter, every complaint theme seems to “rise”. In those cases the test switches to a <strong>Cochran–Mantel–Haenszel</strong> version that compares 1★ reviews only with 1★ reviews, 5★ only with 5★, and so on.</p>
+<p>The Sony headphones below show why this matters. “Good sound quality” fell from 62% to 44% of reviews, which looks dramatic. But much of the recent sample came from the 1★ filter. Compared like with like, the drop is no larger than chance would produce, so the verdict is <strong>Could just be luck</strong>.</p>
 <figure><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/panel-themes.png" alt="Side panel showing themes &#39;Good sound quality&#39; and &#39;Value for money?&#39;, each with a sparkline of monthly share, a change range bar crossing zero, and the verdict &#39;Could just be luck&#39;." /><figcaption>Sony headphones (493 reviews over 40 months): large-looking drops that the star-level comparison shows could be luck. The box crosses the 0 line.</figcaption></figure>
-<p><strong>What a real change looks like.</strong> On the Realme
-neckband at the top of this post, short verdicts about the product fell
-from 30% to 12% of reviews after January 2026: −19 points, with a likely
-range of −31 to −7 that stays well away from 0 (q = 0.04). The typical
-sentences show what moved: <em>“Not good for calling”</em> before,
-<em>“Everything is good”</em> after. The test can’t say <em>why</em>: a
-fix to call quality, or a change in who reviews. It also shows a known
-weakness. This theme mixes “good” and “not good”, because sentence
-vectors group by topic more than by opinion.</p>
-<h3 id="search-results-which-rating-can-you-trust">4. Search results:
-which rating can you trust?</h3>
-<p>Sorting by average rating puts 5.0★ from 3 ratings above 4.3★ from
-2,000. Instead, each result gets</p>
+<p><strong>What a real change looks like.</strong> On the Realme neckband at the top of this post, short verdicts about the product fell from 30% to 12% of reviews after January 2026: −19 points, with a likely range of −31 to −7 that stays well away from 0 (q = 0.04). The typical sentences show what moved: <em>“Not good for calling”</em> before, <em>“Everything is good”</em> after. The test can’t say <em>why</em>: a fix to call quality, or a change in who reviews. It also shows a known weakness. This theme mixes “good” and “not good”, because sentence vectors group by topic more than by opinion.</p>
+<h3 id="search-results-which-rating-can-you-trust">4. Search results: which rating can you trust?</h3>
+<p>Sorting by average rating puts 5.0★ from 3 ratings above 4.3★ from 2,000. Instead, each result gets</p>
 <figure><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/score-formula.png" alt="Score equals (C times m plus N times average rating) divided by (C plus N), minus 1.645 times sigma divided by the square root of (C plus N)." /></figure>
-<p>a rating pulled towards a typical one, then lowered by its
-uncertainty. I estimated the constants from the research data: typical
-rating m = 3.98★, per-review spread σ = 1.34, prior weight C ≈ 5
-ratings. So 4.6★ from 9 ratings scores about 3.79, while 4.3★ from 2,000
-scores about 4.25. “Sort this page” reorders only the current page. It
-never loads more.</p>
+<p>a rating pulled towards a typical one, then lowered by its uncertainty. I estimated the constants from the research data: typical rating m = 3.98★, per-review spread σ = 1.34, prior weight C ≈ 5 ratings. So 4.6★ from 9 ratings scores about 3.79, while 4.3★ from 2,000 scores about 4.25. “Sort this page” reorders only the current page. It never loads more.</p>
 <h3 id="unusual-floods-of-reviews">5. Unusual floods of reviews</h3>
-<p>The check finds the busiest 14-day window and asks how likely that
-many reviews would be at the product’s usual pace, using a Poisson tail
-corrected for having searched every window. It reports a signal only if
-the burst is very unlikely (p &lt; 0.001) <strong>and</strong> those
-reviews were also clearly more positive or more often unverified than
-the rest.</p>
-<h2 id="does-it-work-checking-on-real-data">Does it work? Checking on
-real data</h2>
-<p>I checked the method in a Python notebook on the <strong>McAuley Lab
-Amazon Reviews 2023</strong> dataset (All_Beauty), running the same
-steps as the extension, with sentence embeddings computed on a laptop
-GPU.</p>
-<p><strong>False alarms and power.</strong> In simulation, with a theme
-at 10% of reviews:</p>
+<p>The check finds the busiest 14-day window and asks how likely that many reviews would be at the product’s usual pace, using a Poisson tail corrected for having searched every window. It reports a signal only if the burst is very unlikely (p &lt; 0.001) <strong>and</strong> those reviews were also clearly more positive or more often unverified than the rest.</p>
+<h2 id="does-it-work-checking-on-real-data">Does it work? Checking on real data</h2>
+<p>I checked the method in a Python notebook on the <strong>McAuley Lab Amazon Reviews 2023</strong> dataset (All_Beauty), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.</p>
+<p><strong>False alarms and power.</strong> In simulation, with a theme at 10% of reviews:</p>
 <figure><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/power.png" alt="Line chart: share of runs with p ≤ 0.05 versus theme share after the change, for 100, 150, 300 and 600 reviews. All start near 5% with no change; at 25% after, detection is 43%, 53%, 85% and 99%." /><figcaption>Share of simulated products flagged. The left point (no change) is the false-alarm rate, about 5% at every size. The other points show how often a real change is caught.</figcaption></figure>
-<p>The false-alarm rate stays near 5% at every size. With 300 reviews, a
-rise from 10% to 25% is caught 85% of the time. With 100 reviews, only
-43% of the time. So <strong>“Could just be luck” with about 100 reviews
-means “not enough reviews to tell”</strong>, not “nothing changed”. The
-panel says so.</p>
-<p><strong>A real product change, found at the right month.</strong>
-Across 50 products with long histories, the test flagged 86 theme
-changes in 33 products. The clearest was a pack of wipes. A theme about
-<em>packaging, new, open</em> rose from 8% to 40% of reviews from June
-2021 (q = 0.008). I then read the reviews: <em>“They changed the
-packaging. They no longer use the good snap shut packaging”</em>, and
-<em>“New packaging awful… Impossible to open!!!”</em></p>
+<p>The false-alarm rate stays near 5% at every size. With 300 reviews, a rise from 10% to 25% is caught 85% of the time. With 100 reviews, only 43% of the time. So <strong>“Could just be luck” with about 100 reviews means “not enough reviews to tell”</strong>, not “nothing changed”. The panel says so.</p>
+<p><strong>A real product change, found at the right month.</strong> Across 50 products with long histories, the test flagged 86 theme changes in 33 products. The clearest was a pack of wipes. A theme about <em>packaging, new, open</em> rose from 8% to 40% of reviews from June 2021 (q = 0.008). I then read the reviews: <em>“They changed the packaging. They no longer use the good snap shut packaging”</em>, and <em>“New packaging awful… Impossible to open!!!”</em></p>
 <figure><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/wipes-change.png" alt="Line chart: share of reviews mentioning packaging stays between 5% and 15% from 2018 to early 2021, then jumps to about 60% in late 2021, after a dashed line marking the June 2021 change." /><figcaption>Reviews of the wipes product mentioning packaging or opening, per half-year, with 95% ranges. (A keyword version of the theme, for illustration.)</figcaption></figure>
-<p><strong>Not every detected change is a product change.</strong>
-Reading the other flagged products, I found changes in who buys the
-product (a spray bottle that went from “curly hair” to “plant misting”
-reviews), shifts in reviewing culture (incentivized reviews before
-Amazon’s 2016 ban), and listings that bundle several products. The
-statistics can say <em>that</em> something changed. Only reading can say
-<em>what</em>. That’s why every theme in the panel shows its most
-typical sentences.</p>
-<p><strong>A suspicious burst.</strong> One eye cream received 109
-reviews in 14 days, against a usual pace of about 3. Those reviews
-averaged 4.81★ against 4.27★, and 99% were unverified against 34%. This
-is exactly the pattern the Review pattern check looks for. It’s still a
-<em>signal</em>, not proof.</p>
-<h2 id="what-went-wrong-and-what-it-taught-me">What went wrong, and what
-it taught me</h2>
-<p>I logged every problem, why it happened, and why my tests didn’t
-catch it earlier: 53 entries so far. A few that changed the design:</p>
+<p><strong>Not every detected change is a product change.</strong> Reading the other flagged products, I found changes in who buys the product (a spray bottle that went from “curly hair” to “plant misting” reviews), shifts in reviewing culture (incentivized reviews before Amazon’s 2016 ban), and listings that bundle several products. The statistics can say <em>that</em> something changed. Only reading can say <em>what</em>. That’s why every theme in the panel shows its most typical sentences.</p>
+<p><strong>A suspicious burst.</strong> One eye cream received 109 reviews in 14 days, against a usual pace of about 3. Those reviews averaged 4.81★ against 4.27★, and 99% were unverified against 34%. This is exactly the pattern the Review pattern check looks for. It’s still a <em>signal</em>, not proof.</p>
+<h2 id="what-went-wrong-and-what-it-taught-me">What went wrong, and what it taught me</h2>
+<p>I logged every problem, why it happened, and why my tests didn’t catch it earlier: 53 entries so far. A few that changed the design:</p>
 <ul>
-<li><strong>“Collect everything” isn’t possible.</strong> Amazon shows
-at most 100 reviews per sort or filter. The extension now works through
-filters, merges them without duplicates, and shows how much of the
-history it holds (“493 of 7,469 reviews, 40 months”).</li>
-<li><strong>Stratifying all the time hid real changes.</strong> The
-star-level test is less powerful, so it now runs only when filtered
-views were used <em>and</em> the collection is incomplete.</li>
-<li><strong>A small language model fails in quiet ways.</strong> Gemini
-Nano sometimes added numbers that weren’t in the results, wrote “over
-100” for 87, or turned “fell” into “rose”. Every summary is now checked
-against the test results: each number must appear there, and no change
-can be claimed when none is significant. If a check fails, a plain
-template is used instead.</li>
-<li><strong>Statistics people can read.</strong> Early versions showed
-p, q and Δ. Most people can’t use those. The panel now shows a verdict
-(<strong>Real change</strong>, <strong>Could just be luck</strong>,
-<strong>Not proven</strong>), a monthly chart and one plain sentence
-with the counts. The numbers are under “Details”.</li>
-<li><strong>Present in the page isn’t the same as visible.</strong> The
-search score badges passed every test but weren’t visible in Chrome:
-Amazon clips the title link they were placed in. Tests on saved pages
-can’t see CSS.</li>
+<li><strong>“Collect everything” isn’t possible.</strong> Amazon shows at most 100 reviews per sort or filter. The extension now works through filters, merges them without duplicates, and shows how much of the history it holds (“493 of 7,469 reviews, 40 months”).</li>
+<li><strong>Stratifying all the time hid real changes.</strong> The star-level test is less powerful, so it now runs only when filtered views were used <em>and</em> the collection is incomplete.</li>
+<li><strong>A small language model fails in quiet ways.</strong> Gemini Nano sometimes added numbers that weren’t in the results, wrote “over 100” for 87, or turned “fell” into “rose”. Every summary is now checked against the test results: each number must appear there, and no change can be claimed when none is significant. If a check fails, a plain template is used instead.</li>
+<li><strong>Statistics people can read.</strong> Early versions showed p, q and Δ. Most people can’t use those. The panel now shows a verdict (<strong>Real change</strong>, <strong>Could just be luck</strong>, <strong>Not proven</strong>), a monthly chart and one plain sentence with the counts. The numbers are under “Details”.</li>
+<li><strong>Present in the page isn’t the same as visible.</strong> The search score badges passed every test but weren’t visible in Chrome: Amazon clips the title link they were placed in. Tests on saved pages can’t see CSS.</li>
 </ul>
 <h2 id="is-this-new">Is this new?</h2>
-<p>The building blocks are established, and this project applies them
-rather than inventing them:</p>
+<p>The building blocks are established, and this project applies them rather than inventing them:</p>
 <ul>
-<li><strong>c-TF-IDF topic labels:</strong> Grootendorst,
-<em>BERTopic</em> (2022).</li>
-<li><strong>Change-point tests with permutation p-values:</strong> a
-standard non-parametric approach for scanning statistics.</li>
-<li><strong>False-discovery rate:</strong> Benjamini &amp; Hochberg
-(1995).</li>
-<li><strong>Shrinking ratings with few votes:</strong> the Bayesian
-average used by many ranking systems, here with a lower confidence bound
-and constants estimated from data.</li>
+<li><strong>c-TF-IDF topic labels:</strong> Grootendorst, <em>BERTopic</em> (2022).</li>
+<li><strong>Change-point tests with permutation p-values:</strong> a standard non-parametric approach for scanning statistics.</li>
+<li><strong>False-discovery rate:</strong> Benjamini &amp; Hochberg (1995).</li>
+<li><strong>Shrinking ratings with few votes:</strong> the Bayesian average used by many ranking systems, here with a lower confidence bound and constants estimated from data.</li>
 </ul>
-<p>Existing tools answer different questions. Amazon’s “Customers say”
-summarises reviews, but has no time dimension and no uncertainty.
-Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their
-own servers. Keepa tracks price history, not reviews.</p>
-<p>What Real Deal adds is the combination: <strong>per-theme change
-tests over time, with false-discovery control and a fix for Amazon’s
-star filters, running entirely on-device</strong>, and explained in
-plain language.</p>
+<p>Existing tools answer different questions. Amazon’s “Customers say” summarises reviews, but has no time dimension and no uncertainty. Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their own servers. Keepa tracks price history, not reviews.</p>
+<p>What Real Deal adds is the combination: <strong>per-theme change tests over time, with false-discovery control and a fix for Amazon’s star filters, running entirely on-device</strong>, and explained in plain language.</p>
 <h2 id="limitations-and-next-steps">Limitations and next steps</h2>
 <ul>
-<li>It sees only the reviews you open, and Amazon decides which 100
-reviews each view shows.</li>
+<li>It sees only the reviews you open, and Amazon decides which 100 reviews each view shows.</li>
 <li>About 100 reviews only detect large shifts.</li>
-<li>Failures can rise over time as units age, even if the product hasn’t
-changed.</li>
+<li>Failures can rise over time as units age, even if the product hasn’t changed.</li>
 <li>A theme can merge two related topics.</li>
-<li>Hindi and Hinglish reviews are skipped, because the model is
-English-only.</li>
+<li>Hindi and Hinglish reviews are skipped, because the model is English-only.</li>
 </ul>
-<p>Next, I’d add a multilingual model for Hindi and Hinglish, split
-themes that merge two topics, and support Flipkart.</p>
-<p><strong>The takeaway:</strong> a star average is one number standing
-in for years of changing experiences. Asking <em>how sure</em> and
-<em>since when</em> turns it into something you can actually decide
-with, and both questions can be answered on your own computer.</p>
-<p>The formulas, the validation notebook and the full log of decisions
-are in the <a href="https://github.com/Saminay786/real-deal">GitHub
-repo</a>.</p>
+<p>Next, I’d add a multilingual model for Hindi and Hinglish, split themes that merge two topics, and support Flipkart.</p>
+<p><strong>The takeaway:</strong> a star average is one number standing in for years of changing experiences. Asking <em>how sure</em> and <em>since when</em> turns it into something you can actually decide with, and both questions can be answered on your own computer.</p>
+<p>The formulas, the validation notebook and the full log of decisions are in the <a href="https://github.com/Saminay786/real-deal">GitHub repo</a>.</p>
 </body>
 </html>
