@@ -105,6 +105,13 @@
     "text": "Limitations and next steps\nThe data is observational, so the Double ML result holds only if I’ve measured what drives both promo decisions and sales. There’s no cost data: margin (30% of price), supplier funding (50% of the discount) and display costs are assumptions. Cannibalisation and stock-piling are handled with simple rules, and the 2,500-household panel makes the test far weaker than a real retailer’s full store sales would. Next, I’d scale product-level effects to category level before optimising, model stock-piling directly, and compare other test designs, such as alternating weeks.\nThe takeaway: judge a promotion by the sales it creates, not the sales it records. Almost half of promo volume was going to happen anyway.\nFull code, results and every number above are in the GitHub repo."
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Have These Reviews Changed?\n\n\nA Chrome extension that tests, on your own computer, whether an Amazon product’s reviews really changed over time\n\n\n\nstatistics\n\nNLP\n\nchange-point detection\n\nproduct\n\n\n\n\nStar averages hide two things: how sure we can be about them, and whether the product changed since most reviews were written. I built Real Deal, a Chrome extension for amazon.in that finds review themes with an on-device language model and tests whether each theme’s share changed, with permutation tests and false-discovery control. No servers, no network calls.\n\n\n\n\n\n\nNov 22, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nSame Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nAlmost Half of Promo Sales Would Have Happened Anyway\n\n\nMeasuring what grocery discounts really cause, and planning promotions around it\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\n\nA discount that doubles sales can still lose money. Using two years of real grocery data, I measured what discounts actually cause, built a promo calendar around it, checked it with a second model, and asked whether a store test could even prove it works.\n\n\n\n\n\n\nNov 8, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "Samina Yasmin",
@@ -124,13 +131,6 @@
     "title": "Samina Yasmin",
     "section": "Experience",
     "text": "Experience\nDecision Science Analyst | 2025 – present\nBuilding pricing, forecasting and demand-sourcing models for industrial clients.\nAmerican Express, Data Analytics & Risk Tech. Lab (via IIT Madras) | Research Associate | 2023 – 2025"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Have These Reviews Changed?\n\n\nA Chrome extension that tests, on your own computer, whether an Amazon product’s reviews really changed over time\n\n\n\nstatistics\n\nNLP\n\nchange-point detection\n\nproduct\n\n\n\n\nStar averages hide two things: how sure we can be about them, and whether the product changed since most reviews were written. I built Real Deal, a Chrome extension for amazon.in that finds review themes with an on-device language model and tests whether each theme’s share changed, with permutation tests and false-discovery control. No servers, no network calls.\n\n\n\n\n\n\nNov 22, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nSame Fraud Score, Different Decision\n\n\nTurning fraud probabilities into approve, review or decline, by the cost of getting it wrong\n\n\n\nrisk\n\nfraud\n\ndecision science\n\ncalibration\n\n\n\n\nA fraud model says how risky a transaction is. It doesn’t say what to do. I built a decision layer that picks approve, review or decline by expected € cost, under a review-capacity limit, and measured it with bootstrap confidence intervals.\n\n\n\n\n\n\nNov 16, 2026\n\n\nSamina Yasmin\n\n\n\n\n\n\n\n\n\n\n\n\nAlmost Half of Promo Sales Would Have Happened Anyway\n\n\nMeasuring what grocery discounts really cause, and planning promotions around it\n\n\n\npricing\n\ncausal inference\n\noptimization\n\nexperimentation\n\nBayesian\n\n\n\n\nA discount that doubles sales can still lose money. Using two years of real grocery data, I measured what discounts actually cause, built a promo calendar around it, checked it with a second model, and asked whether a store test could even prove it works.\n\n\n\n\n\n\nNov 8, 2026\n\n\nSamina Yasmin\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/2026-11-16-fraud-score-to-decision/index.html",
