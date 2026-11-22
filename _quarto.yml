@@ -2,6 +2,7 @@ project:
   type: website
   resources:
     - medium/real-deal-plain.html
+    - medium/real-deal-v2.html
 
 website:
   title: "Samina"
