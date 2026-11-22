@@ -113,12 +113,12 @@ I logged every problem, why it happened, and why my tests didn't catch it earlie
 
 The building blocks are established, and this project applies them rather than inventing them:
 
-- **c-TF-IDF topic labels:** Grootendorst, *BERTopic* (2022).
+- **c-TF-IDF topic labels:** Grootendorst, [*BERTopic*](https://arxiv.org/abs/2203.05794) (2022).
 - **Change-point tests with permutation p-values:** a standard non-parametric approach for scanning statistics.
 - **False-discovery rate:** Benjamini & Hochberg (1995).
 - **Shrinking ratings with few votes:** the Bayesian average used by many ranking systems, here with a lower confidence bound and constants estimated from data.
 
-Existing tools answer different questions. Amazon's "Customers say" summarises reviews, but has no time dimension and no uncertainty. Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their own servers. Keepa tracks price history, not reviews.
+Existing tools answer different questions. Amazon's ["Customers say"](https://www.aboutamazon.com/news/amazon-ai/amazon-ai-generated-review-highlights) summarises reviews, but has no time dimension and no uncertainty. Fakespot ([shut down by Mozilla in July 2025](https://blog.mozilla.org/en/mozilla/building-whats-next/)) and [ReviewMeta](https://www.retailbrew.com/stories/2021/07/12/reviewmeta-wants-helps-online-shoppers-reality-check-shady-amazon-reviews) (no longer operating) graded authenticity on their own servers. [Keepa](https://keepa.com) tracks price history, not reviews.
 
 What Real Deal adds is the combination: **per-theme change tests over time, with false-discovery control and a fix for Amazon's star filters, running entirely on-device**, and explained in plain language.
 
