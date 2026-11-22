@@ -80,12 +80,12 @@
 <h2 id="is-this-new">Is this new?</h2>
 <p>The building blocks are established, and this project applies them rather than inventing them:</p>
 <ul>
-<li><strong>c-TF-IDF topic labels:</strong>&#160;Grootendorst,&#160;<em>BERTopic</em>&#160;(2022).</li>
+<li><strong>c-TF-IDF topic labels:</strong>&#160;Grootendorst, <a href="https://arxiv.org/abs/2203.05794"><em>BERTopic</em></a> (2022).</li>
 <li><strong>Change-point tests with permutation p-values:</strong>&#160;a standard non-parametric approach for scanning statistics.</li>
 <li><strong>False-discovery rate:</strong>&#160;Benjamini &amp; Hochberg (1995).</li>
 <li><strong>Shrinking ratings with few votes:</strong>&#160;the Bayesian average used by many ranking systems, here with a lower confidence bound and constants estimated from data.</li>
 </ul>
-<p>Existing tools answer different questions. Amazon’s “Customers say” summarises reviews, but has no time dimension and no uncertainty. Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their own servers. Keepa tracks price history, not reviews.</p>
+<p>Existing tools answer different questions. Amazon’s <a href="https://www.aboutamazon.com/news/amazon-ai/amazon-ai-generated-review-highlights">“Customers say”</a> summarises reviews, but has no time dimension and no uncertainty. Fakespot (<a href="https://blog.mozilla.org/en/mozilla/building-whats-next/">shut down by Mozilla in July 2025</a>) and <a href="https://www.retailbrew.com/stories/2021/07/12/reviewmeta-wants-helps-online-shoppers-reality-check-shady-amazon-reviews">ReviewMeta</a> (no longer operating) graded authenticity on their own servers. <a href="https://keepa.com">Keepa</a> tracks price history, not reviews.</p>
 <p>What Real Deal adds is the combination: <strong>per-theme change tests over time, with false-discovery control and a fix for Amazon’s star filters, running entirely on-device</strong>, and explained in plain language.</p>
 <h2 id="try-it-yourself">Try it yourself</h2>
 <p>Real Deal is open source, and you can install it without any coding:</p>
