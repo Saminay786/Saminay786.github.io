@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - medium/real-deal-plain.html
 
 website:
   title: "Samina"
