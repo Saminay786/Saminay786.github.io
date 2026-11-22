@@ -498,7 +498,7 @@ window.Quarto = {
 </section>
 <section id="does-it-work-checking-on-real-data" class="level2">
 <h2 class="anchored" data-anchor-id="does-it-work-checking-on-real-data">Does it work? Checking on real data</h2>
-<p>I checked the method in a Python notebook on the <strong>McAuley Lab Amazon Reviews 2023</strong> dataset (All_Beauty), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.</p>
+<p>I checked the method in a Python notebook on the <strong>McAuley Lab Amazon Reviews 2023</strong> dataset (All_Beauty; Hou et al., 2024), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.</p>
 <p><strong>False alarms and power.</strong> In simulation, with a theme at 10% of reviews:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -552,6 +552,9 @@ window.Quarto = {
 <p>Next, I’d add a multilingual model for Hindi and Hinglish, split themes that merge two topics, and support Flipkart.</p>
 <p><strong>The takeaway:</strong> a star average is one number standing in for years of changing experiences. Asking <em>how sure</em> and <em>since when</em> turns it into something you can actually decide with, and both questions can be answered on your own computer.</p>
 <p>The formulas, the validation notebook and the full log of decisions are in the <a href="https://github.com/Saminay786/real-deal">GitHub repo</a>.</p>
+<hr>
+<p><em>Data: Hou, Y., Li, J., He, Z., Yan, A., Chen, X. &amp; McAuley, J. (2024). Bridging Language and Items for Retrieval and Recommendation. arXiv:2403.03952. The dataset is shared for research and isn’t redistributed here.</em></p>
+<p><em>Real Deal is an independent personal project, not affiliated with or endorsed by Amazon. Amazon is a trademark of Amazon.com, Inc.; other product and brand names belong to their owners. The extension only reads pages you open. Its one automated action, “Load this view”, runs only when you press it, clicks Amazon’s own “Show 10 more” button every 2–4 seconds and stops at Amazon’s limit. Results are signals to read further, never verdicts that a product or review is fake.</em></p>
 
 
 </section>
