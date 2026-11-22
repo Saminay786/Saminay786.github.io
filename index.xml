@@ -77,8 +77,8 @@
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/panel-themes.png" class="img-fluid figure-img" alt="Side panel showing themes 'Good sound quality' and 'Value for money?', each with a sparkline of monthly share, a change range bar, and the verdict 'Could just be luck'."></p>
-<figcaption>Themes over time for a pair of Sony headphones (493 reviews over 40 months). Each theme has a monthly chart, its share before and after the most likely change, and a verdict.</figcaption>
+<p><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/panel-real-change.png" class="img-fluid figure-img" alt="Side panel card for the theme 'good, calling, everything' marked Real change: monthly share drops from 30% to 12% at a dashed line in January 2026; change box from -31 to -7 points, entirely left of zero; typical sentences before are 'Not that good', 'Not good for calling', after are 'Good no issues', 'Everything is good'."></p>
+<figcaption>A <strong>Real change</strong> on a Realme neckband (336 reviews over 29 months). Short verdicts like “Not good for calling” fell from 30% to 12% of reviews after January 2026. The green box is the likely size of the change, and it stays clear of 0.</figcaption>
 </figure>
 </div>
 </div>
@@ -116,6 +116,13 @@
 <p>A product has several themes, so several tests run at once. <strong>Benjamini–Hochberg</strong> controls the false-discovery rate across them. A theme is shown as <strong>Real change</strong> only if q ≤ 0.10.</p>
 <p><strong>The star-filter trap.</strong> Amazon shows at most 100 reviews per sort or filter. To reach older reviews, you have to open filters like “1★ only”. But if the later months come mostly from the 1★ filter, every complaint theme seems to “rise”. In those cases the test switches to a <strong>Cochran–Mantel–Haenszel</strong> version that compares 1★ reviews only with 1★ reviews, 5★ only with 5★, and so on.</p>
 <p>The Sony example above shows why this matters. “Good sound quality” fell from 62% to 44% of reviews, which looks dramatic. But much of the recent sample came from the 1★ filter. Compared like with like, the drop is no larger than chance would produce, so the verdict is <strong>Could just be luck</strong>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://saminay786.github.io/posts/2026-11-22-real-deal-amazon-reviews/panel-themes.png" class="img-fluid figure-img" style="width:60.0%" alt="Side panel showing themes 'Good sound quality' and 'Value for money?', each with a sparkline of monthly share, a change range bar crossing zero, and the verdict 'Could just be luck'."></p>
+<figcaption>Sony headphones (493 reviews over 40 months): large-looking drops that the star-level comparison shows could be luck. The box crosses the 0 line.</figcaption>
+</figure>
+</div>
+<p><strong>What a real change looks like.</strong> On the Realme neckband at the top of this post, short verdicts about the product fell from 30% to 12% of reviews after January 2026: −19 points, with a likely range of −31 to −7 that stays well away from 0 (q = 0.04). The typical sentences show what moved: <em>“Not good for calling”</em> before, <em>“Everything is good”</em> after. The test can’t say <em>why</em>: a fix to call quality, or a change in who reviews. It also shows a known weakness. This theme mixes “good” and “not good”, because sentence vectors group by topic more than by opinion.</p>
 </section>
 <section id="search-results-which-rating-can-you-trust" class="level3">
 <h3 class="anchored" data-anchor-id="search-results-which-rating-can-you-trust">4. Search results: which rating can you trust?</h3>
