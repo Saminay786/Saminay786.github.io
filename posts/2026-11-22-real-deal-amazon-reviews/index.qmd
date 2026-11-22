@@ -33,7 +33,7 @@ Everything runs **inside your browser**: the language model, the statistics and 
 | Side panel | Review pattern check | Unusual floods of reviews: *signals* worth reading about, never "fake" |
 
 ::: {layout-ncol=2}
-![Themes over time for a pair of Sony headphones (493 reviews over 40 months). Each theme has a monthly chart, its share before and after the most likely change, and a verdict.](panel-themes.png){fig-alt="Side panel showing themes 'Good sound quality' and 'Value for money?', each with a sparkline of monthly share, a change range bar, and the verdict 'Could just be luck'."}
+![A **Real change** on a Realme neckband (336 reviews over 29 months). Short verdicts like "Not good for calling" fell from 30% to 12% of reviews after January 2026. The green box is the likely size of the change, and it stays clear of 0.](panel-real-change.png){fig-alt="Side panel card for the theme 'good, calling, everything' marked Real change: monthly share drops from 30% to 12% at a dashed line in January 2026; change box from -31 to -7 points, entirely left of zero; typical sentences before are 'Not that good', 'Not good for calling', after are 'Good no issues', 'Everything is good'."}
 
 ![Search results: 21 of 22 results scored, with the top five by score. The score favours ratings backed by many reviews.](panel-search.png){fig-alt="Side panel listing search results scored, a 'Restore Amazon's order' button, and the top 5 products by score, e.g. 4.19 for a 4.2-star product with 32,827 ratings."}
 :::
@@ -64,6 +64,10 @@ A product has several themes, so several tests run at once. **Benjamini–Hochbe
 **The star-filter trap.** Amazon shows at most 100 reviews per sort or filter. To reach older reviews, you have to open filters like "1★ only". But if the later months come mostly from the 1★ filter, every complaint theme seems to "rise". In those cases the test switches to a **Cochran–Mantel–Haenszel** version that compares 1★ reviews only with 1★ reviews, 5★ only with 5★, and so on.
 
 The Sony example above shows why this matters. "Good sound quality" fell from 62% to 44% of reviews, which looks dramatic. But much of the recent sample came from the 1★ filter. Compared like with like, the drop is no larger than chance would produce, so the verdict is **Could just be luck**.
+
+![Sony headphones (493 reviews over 40 months): large-looking drops that the star-level comparison shows could be luck. The box crosses the 0 line.](panel-themes.png){fig-alt="Side panel showing themes 'Good sound quality' and 'Value for money?', each with a sparkline of monthly share, a change range bar crossing zero, and the verdict 'Could just be luck'." width="60%"}
+
+**What a real change looks like.** On the Realme neckband at the top of this post, short verdicts about the product fell from 30% to 12% of reviews after January 2026: −19 points, with a likely range of −31 to −7 that stays well away from 0 (q = 0.04). The typical sentences show what moved: *"Not good for calling"* before, *"Everything is good"* after. The test can't say *why*: a fix to call quality, or a change in who reviews. It also shows a known weakness. This theme mixes "good" and "not good", because sentence vectors group by topic more than by opinion.
 
 ### 4. Search results: which rating can you trust?
 
