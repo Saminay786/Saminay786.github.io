@@ -83,7 +83,7 @@ The check finds the busiest 14-day window and asks how likely that many reviews 
 
 ## Does it work? Checking on real data
 
-I checked the method in a Python notebook on the **McAuley Lab Amazon Reviews 2023** dataset (All_Beauty), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.
+I checked the method in a Python notebook on the **McAuley Lab Amazon Reviews 2023** dataset (All_Beauty; Hou et al., 2024), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.
 
 **False alarms and power.** In simulation, with a theme at 10% of reviews:
 
@@ -135,3 +135,9 @@ Next, I'd add a multilingual model for Hindi and Hinglish, split themes that mer
 **The takeaway:** a star average is one number standing in for years of changing experiences. Asking *how sure* and *since when* turns it into something you can actually decide with, and both questions can be answered on your own computer.
 
 The formulas, the validation notebook and the full log of decisions are in the [GitHub repo](https://github.com/Saminay786/real-deal).
+
+---
+
+*Data: Hou, Y., Li, J., He, Z., Yan, A., Chen, X. & McAuley, J. (2024). Bridging Language and Items for Retrieval and Recommendation. arXiv:2403.03952. The dataset is shared for research and isn't redistributed here.*
+
+*Real Deal is an independent personal project, not affiliated with or endorsed by Amazon. Amazon is a trademark of Amazon.com, Inc.; other product and brand names belong to their owners. The extension only reads pages you open. Its one automated action, "Load this view", runs only when you press it, clicks Amazon's own "Show 10 more" button every 2–4 seconds and stops at Amazon's limit. Results are signals to read further, never verdicts that a product or review is fake.*

@@ -64,7 +64,7 @@ The Sony headphones below show why this matters. "Good sound quality" fell from 
 
 ![Sony headphones (493 reviews over 40 months): large-looking drops that the star-level comparison shows could be luck. The box crosses the 0 line.](../posts/2026-11-22-real-deal-amazon-reviews/panel-themes.png){fig-alt="Side panel showing themes 'Good sound quality' and 'Value for money?', each with a sparkline of monthly share, a change range bar crossing zero, and the verdict 'Could just be luck'."}
 
-**What a real change looks like.** On the Realme neckband at the top of this post, short verdicts about the product fell from 30% to 12% of reviews after January 2026: −19 points, with a likely range of −31 to −7 that stays well away from 0 (q = 0.04). The typical sentences show what moved: *"Not good for calling"* before, *"Everything is good"* after. The test can't say *why*: a fix to call quality, or a change in who reviews. It also shows a known weakness. This theme mixes "good" and "not good", because sentence vectors group by topic more than by opinion.
+**What a real change looks like.** On the Realme neckband shown earlier, short verdicts about the product fell from 30% to 12% of reviews after January 2026: −19 points, with a likely range of −31 to −7 that stays well away from 0 (q = 0.04). The typical sentences show what moved: *"Not good for calling"* before, *"Everything is good"* after. The test can't say *why*: a fix to call quality, or a change in who reviews. It also shows a known weakness. This theme mixes "good" and "not good", because sentence vectors group by topic more than by opinion.
 
 ### 4. Search results: which rating can you trust?
 
@@ -80,7 +80,7 @@ The check finds the busiest 14-day window and asks how likely that many reviews 
 
 ## Does it work? Checking on real data
 
-I checked the method in a Python notebook on the **McAuley Lab Amazon Reviews 2023** dataset (All_Beauty), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.
+I checked the method in a Python notebook on the **McAuley Lab Amazon Reviews 2023** dataset (All_Beauty; Hou et al., 2024), running the same steps as the extension, with sentence embeddings computed on a laptop GPU.
 
 **False alarms and power.** In simulation, with a theme at 10% of reviews:
 
@@ -132,3 +132,9 @@ Next, I'd add a multilingual model for Hindi and Hinglish, split themes that mer
 **The takeaway:** a star average is one number standing in for years of changing experiences. Asking *how sure* and *since when* turns it into something you can actually decide with, and both questions can be answered on your own computer.
 
 The formulas, the validation notebook and the full log of decisions are in the [GitHub repo](https://github.com/Saminay786/real-deal).
+
+---
+
+*Data: Hou, Y., Li, J., He, Z., Yan, A., Chen, X. & McAuley, J. (2024). Bridging Language and Items for Retrieval and Recommendation. arXiv:2403.03952. The dataset is shared for research and isn't redistributed here.*
+
+*Real Deal is an independent personal project, not affiliated with or endorsed by Amazon. Amazon is a trademark of Amazon.com, Inc.; other product and brand names belong to their owners. The extension only reads pages you open. Its one automated action, "Load this view", runs only when you press it, clicks Amazon's own "Show 10 more" button every 2–4 seconds and stops at Amazon's limit. Results are signals to read further, never verdicts that a product or review is fake.*
