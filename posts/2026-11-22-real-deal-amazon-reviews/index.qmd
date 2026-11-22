@@ -8,7 +8,7 @@ categories: [statistics, NLP, change-point detection, product]
 image: wipes-change.png
 ---
 
-**Code:** [github.com/Saminay786/real-deal](https://github.com/Saminay786/real-deal) · **Status:** working prototype (Chrome, amazon.in)
+**Code:** [github.com/Saminay786/real-deal](https://github.com/Saminay786/real-deal) (open source, MIT) · **Try it:** [download](https://github.com/Saminay786/real-deal/releases/latest) · **Status:** working prototype (Chrome, amazon.in)
 
 ## What this project is about
 
@@ -121,6 +121,16 @@ The building blocks are established, and this project applies them rather than i
 Existing tools answer different questions. Amazon's "Customers say" summarises reviews, but has no time dimension and no uncertainty. Fakespot (shut down in 2025) and ReviewMeta graded authenticity on their own servers. Keepa tracks price history, not reviews.
 
 What Real Deal adds is the combination: **per-theme change tests over time, with false-discovery control and a fix for Amazon's star filters, running entirely on-device**, and explained in plain language.
+
+## Try it yourself
+
+Real Deal is open source, and you can install it without any coding:
+
+1. Download `real-deal-v0.1.0.zip` from the [latest release](https://github.com/Saminay786/real-deal/releases/latest) on GitHub.
+2. Unzip it and keep the `real-deal` folder somewhere permanent.
+3. In Chrome, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose the folder.
+
+Then open any product on amazon.in and click the Real Deal icon. A box at the top of the side panel always shows the next step. The [user guide](https://github.com/Saminay786/real-deal/blob/main/docs/USER_GUIDE.md) walks through installing, collecting reviews and reading the results, with screenshots.
 
 ## Limitations and next steps
 
